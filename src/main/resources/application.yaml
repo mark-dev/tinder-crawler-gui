@@ -1,0 +1,8 @@
+spring:
+  thymeleaf:
+    cache: false
+  datasource:
+    url: jdbc:postgresql://localhost/tcrawler?user=postgres&password=postgres
+    hikari:
+      maximum-pool-size: 4
+    driver-class-name: org.postgresql.Driver

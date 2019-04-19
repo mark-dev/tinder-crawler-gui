@@ -1,0 +1,23 @@
+body {
+    padding-top: 64px;
+}
+
+.superliked {
+    font-weight: bold;
+    color: #17a2b8;
+}
+
+.liked {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.disliked {
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.undefined-verdict {
+    font-weight: bold;
+    color: black;
+}

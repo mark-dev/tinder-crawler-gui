@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:if="${!users.isEmpty()}" th:fragment="auserlist">
+    <div th:replace="~{paging::pagingcontrol}"></div>
+    <!--@thymesVar id="adminViewDTO" type="test.view.AdminViewDTO"-->
+    <!--/*@thymesVar id="users" type="java.util.List<ru.gotinder.crawler.persistence.dto.CrawlerDataDTO>"*/-->
+    <div th:each="u : ${users}">
+        <!--/* Workaround for bug https://youtrack.jetbrains.com/issue/IDEA-132738 -->
+        <!--@thymesVar id="u" type="ru.gotinder.crawler.persistence.dto.CrawlerDataDTO"-->
+        <!--*/-->
+        <span>
+                <a
+                        th:href="@{'/user/'+${u.getId()}}"
+                        th:text="${u.getName() + '  ' + (T(java.time.LocalDateTime).now().getYear() - u.getBirthday().getYear())}"
+                        th:classappend="
+                        ${
+                            (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).UNDEFINED ? 'undefined-verdict': '') +
+                            (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).SUPERLIKE ? 'superliked' : '') +
+                            (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).LIKE ? 'liked' : '') +
+                            (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).PASS ? 'disliked' : '')
+                        }"
+                >
+
+                th:classappend="${"
+                    th:classappend="${u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).LIKE} ? 'liked'"
+                    th:classappend="${u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).PASS} ? 'disliked'"
+                </a>
+            </span>
+        <div class="row">
+            <div class="col-md-3">
+                <img th:src="${u.getPhoto().get(0)}" style="max-height: 160px; max-width: 200px;">
+                <div style="font-size: 32px; font-weight: bold" th:text="${u.getRating()}">
+                </div>
+                <div>
+
+                    <a th:href="@{/verdict(id=${u.getId()}, verdict='LIKE')}">
+                        <img src="/img/like.png" alt="like"/>
+                    </a>
+
+                    <a th:href="@{/verdict(id=${u.getId()}, verdict='PASS')}">
+                        <img src="/img/dislike.png" alt="dislike"/>
+                    </a>
+
+                    <a th:href="@{/verdict(id=${u.getId()}, verdict='SUPERLIKE')}">
+                        <img src="/img/superlike.png" alt="superlike"/>
+                    </a>
+                    <a th:if="${sync && u.getVerdict() != T(ru.gotinder.crawler.persistence.dto.VerdictEnum).UNDEFINED}"
+                       th:href="@{/cp/sync-verdict(id=${u.getId()})}"
+                       data-toggle="tooltip"
+                       data-placement="top"
+                       th:title="'Синхронизировать результат' + '(' + ${u.getVerdict()} + ')'">
+                        <img src="/img/sync.png" alt="sync"/>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <span th:text="${u.getBio()}"> </span>
+                <details>
+                    <summary>More photos</summary>
+                    <div th:each="photo : ${u.getPhoto()}">
+                        <img th:src="${photo}" style="max-height: 600px; max-width: 400px;">
+                    </div>
+                </details>
+            </div>
+        </div>
+        <hr>
+    </div>
+
+    <div th:replace="~{paging::pagingcontrol}"></div>
+</div>
+
+<div th:unless="${!users.isEmpty()}" th:fragment="auserlist">
+   Нет данных
+</div>
+
+</body>
+</html>
