@@ -12,6 +12,7 @@ create table if not exists crawler_data
 	birthday timestamp not null,
 	content_hash text not null,
 	s_number text,
+	recs_duplicate_count integer default 0 not null ,
 	updated_at timestamp default now() not null,
 	verdict integer default 0 not null,
 	verdict_sync_at timestamp
@@ -25,6 +26,9 @@ create index if not exists crawler_data_rating_index
 
 create index if not exists crawler_data_ts_index
 	on crawler_data (ts);
+
+create index if not exists crawler_data_recs_duplicate_count_index
+	on crawler_data (recs_duplicate_count desc);
 
 CREATE EXTENSION pg_trgm;
 

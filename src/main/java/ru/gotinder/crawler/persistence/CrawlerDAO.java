@@ -37,7 +37,7 @@ public class CrawlerDAO {
         dto.setRating(rs.getInt("rating"));
         dto.setDistance(rs.getInt("distance"));
         dto.setBirthday(rs.getDate("birthday").toLocalDate());
-
+        dto.setRecsDuplicateCount(rs.getInt("recs_duplicate_count"));
 
         dto.setTs(LocalDateTime.ofInstant(rs.getTimestamp("ts").toInstant(), ZoneOffset.UTC));
         dto.setVerdict(VERDICT_ENUMS[rs.getInt("verdict")]);
@@ -88,6 +88,14 @@ public class CrawlerDAO {
 
     public Integer countVerdicted() {
         return template.queryForObject(SQLHelper.COUNT_VERDICTED_BUT_NOT_SYNCED, Integer.class);
+    }
+
+    public List<CrawlerDataDTO> loadRecsDuplicated(int page, int size) {
+        return template.query(SQLHelper.LOAD_RECS_DUPLICATED, rowMapper, size, page * size);
+    }
+
+    public Integer countRecsDuplicated() {
+        return template.queryForObject(SQLHelper.COUNT_RECS_DUPLICATED, Integer.class);
     }
 
     public void updateRating(Map<String, Integer> ratingMap) {

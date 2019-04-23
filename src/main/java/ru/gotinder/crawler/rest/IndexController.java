@@ -55,6 +55,11 @@ public class IndexController {
                 count = dao.countVerdicted();
                 displaySync = true;
                 break;
+            case RECS_DUPLICATED:
+                users = dao.loadRecsDuplicated(page, size);
+                count = dao.countRecsDuplicated();
+                displaySync = true;
+                break;
         }
         model.addAttribute("sync", displaySync);
         model.addAttribute("users", users);

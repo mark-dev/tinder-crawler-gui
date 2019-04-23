@@ -18,7 +18,7 @@ import java.util.*;
 @Slf4j
 @Service
 public class TinderCrawlerService {
-    public static final int CRAWLER_LOOPS = 20;
+    public static final int CRAWLER_LOOPS = 4;
 
     @Autowired
     FacebookGateway fb;
@@ -52,10 +52,7 @@ public class TinderCrawlerService {
 
 
     public Integer crawNewData() {
-        log.info("Craw data from tinder...");
-
         Set<User> collect = collect(CRAWLER_LOOPS);
-
         ArrayList<User> details = new ArrayList<>(collect);
         dao.saveBatch(details);
         return scoring();
@@ -111,7 +108,6 @@ public class TinderCrawlerService {
     }
 
     private Integer scoring() {
-        log.info("Scoring begin..");
         Integer unratedBefore = dao.countUnrated();
 
         List<CrawlerDataDTO> users = null;
@@ -124,8 +120,6 @@ public class TinderCrawlerService {
             dao.updateRating(ratingMap);
         }
         Integer unratedAfter = dao.countUnrated();
-
-        log.info("Scoring finished");
         return unratedBefore - unratedAfter;
     }
 
@@ -134,9 +128,14 @@ public class TinderCrawlerService {
         Tinder api = getAPI();
         Set<User> uniqueUsers = new HashSet<>();
         for (int i = 0; i < loops; i++) {
-            log.info("loop: {} of {} ... ", i, loops);
-
-            ArrayList<User> recs = api.getRecommendations();
+            log.info("Crawler recs collect loop: {}/{}", i + 1, loops);
+            ArrayList<User> recs;
+            try {
+                recs = api.getRecommendations();
+            } catch (Exception ex) {
+                log.error("Exception while recomendation fetch: {}", ex.getClass());
+                break;
+            }
             Thread.sleep(1000);
             uniqueUsers.addAll(recs);
         }

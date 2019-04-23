@@ -33,6 +33,16 @@
                 <div style="font-size: 32px; font-weight: bold" th:text="${u.getRating()}">
                 </div>
                 <div>
+                    <span>
+                        <img src="/img/compass.png" alt="dst"/>
+                        <span th:text="${u.getDistance()}"></span>
+                    </span>
+                    <span>
+                         <img src="/img/abacus.png" alt="recs-duplicate"/>
+                        <span th:text="${u.getRecsDuplicateCount()}"></span>
+                    </span>
+                </div>
+                <div>
 
                     <a th:href="@{/verdict(id=${u.getId()}, verdict='LIKE')}">
                         <img src="/img/like.png" alt="like"/>
@@ -71,7 +81,7 @@
 </div>
 
 <div th:unless="${!users.isEmpty()}" th:fragment="auserlist">
-   Нет данных
+    Нет данных
 </div>
 
 </body>

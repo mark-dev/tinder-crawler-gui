@@ -16,15 +16,17 @@ public class ScheduledTinderService {
     @Autowired
     CrawlerDAO dao;
 
-    @Scheduled(fixedRate = 1000L * 60 * 60 * 10) //раз в 10ч
+    public static final long HOUR_MS = 1000L * 60 * 60;
+
+    @Scheduled(fixedRate = HOUR_MS * 2, initialDelay = HOUR_MS)
     public void sheduleCrawNewData() {
         log.info("sheduleCrawNewData -- BEGIN");
         Integer ctx = tcs.crawNewData();
+        log.info("scheduled crawler task: {} new entry", ctx);
         log.info("sheduleCrawNewData -- END");
-        log.info("scheduled crawler got {} new values", ctx);
     }
 
- //   @Scheduled(fixedRate = 1000L * 60 * 60 * 24) //раз в 5ч
+    //   @Scheduled(fixedRate = 1000L * 60 * 60 * 24) //раз в 5ч
     public void syncTinderResults() {
         tcs.syncVerdictBatch(50);
     }

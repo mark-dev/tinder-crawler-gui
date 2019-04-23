@@ -1,8 +1,11 @@
 package ru.gotinder.crawler.service;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,7 @@ public class FacebookGateway {
         lastTokenTs = Instant.now();
     }
 
+    @SneakyThrows
     private String obtainFaceBookTokenViaChromeDriver() {
 
         String profileDir = "/home/mark/.config/google-chrome/selenium";
@@ -48,11 +52,21 @@ public class FacebookGateway {
         options.setBinary("/usr/bin/google-chrome");
         WebDriver driver = new ChromeDriver(options);
         driver.get(tokenUrl);
+        try {
+            WebElement element = driver.findElement(By.xpath("//*[@id=\"platformDialogForm\"]/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/button[2]"));
+            element.submit();
+        } catch (NoSuchElementException ex) {
+            //TODO: implement login via hard-coded login&password
+            log.info("Facebook submit form not found \n" +
+                    "Probably this is your first application run, you need manually login to facebook using selenium profile of google chrome \n" +
+                    "Sign in and restart app");
+            Thread.sleep(10000);
+        }
 
-        driver.findElement(By.xpath("//*[@id=\"platformDialogForm\"]/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/button[2]")).submit();
+
         String htmlSource = driver.getPageSource();
 
-        log.info(htmlSource);
+        log.debug(htmlSource);
         Matcher matcher = EXTRACT_TOKEN_PATTERN.matcher(htmlSource);
         boolean hasToken = matcher.find();
 
