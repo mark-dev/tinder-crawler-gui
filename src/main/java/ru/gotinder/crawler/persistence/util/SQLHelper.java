@@ -15,8 +15,8 @@ public interface SQLHelper {
     String COUNT_UNRATED = "select count(*) from crawler_data where rating = -1;";
     String LOAD_UNRATED = "SELECT * FROM crawler_data WHERE rating = -1 LIMIT 500";
 
-    String LOAD_BY_RATING = "SELECT * FROM crawler_data WHERE verdict = 0 AND verdict_sync_at is null ORDER BY rating desc, length(bio) DESC LIMIT ? OFFSET ?";
-    String COUNT_BY_RATING = "SELECT count(*) FROM crawler_data WHERE verdict = 0 AND verdict_sync_at is null";
+    String LOAD_BY_RATING = "SELECT * FROM crawler_data WHERE verdict = 0 AND (length(?) = 0 OR bio like '%'|| lower(?) || '%') AND verdict_sync_at is null ORDER BY rating desc, length(bio) DESC LIMIT ? OFFSET ?";
+    String COUNT_BY_RATING = "SELECT count(*) FROM crawler_data WHERE verdict = 0 AND (length(?) = 0 OR bio like '%'|| lower(?) || '%') AND verdict_sync_at is null";
 
     String COUNT_LATEST = "SELECT count(*) from crawler_data WHERE verdict = 0 AND verdict_sync_at is null";
     String LOAD_LATEST = "select * from crawler_data " +

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:if="${page != null && count != null && size != null}"
+     th:fragment="pagingcontrol" style="text-align: center">
+        <span>
+             <a th:href="@{/(page=${page-1 >= 0 ? page-1 : 0},type=${type})}"
+                class="icon fa-arrow-left"
+                style="font-size: 48px">
+
+             </a>
+            <b style="font-size: 16px" th:text="${page} + '/' + ${count/size}"></b>
+            <a th:href="@{/(page=${page+1 <= count/size ? page+1 : count/size})}"
+               class="icon fa-arrow-right"
+               style="font-size: 48px">
+
+            </a>
+        </span>
+</div>
+</body>
+</html>

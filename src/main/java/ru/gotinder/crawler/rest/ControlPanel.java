@@ -4,11 +4,11 @@ import com.djm.tinder.like.SuperLikeResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
+import ru.gotinder.crawler.persistence.dto.VerdictEnum;
+import ru.gotinder.crawler.rest.dto.SetVerdictDTO;
+import ru.gotinder.crawler.rest.dto.SyncVerdictDTO;
 import ru.gotinder.crawler.service.FacebookGateway;
 import ru.gotinder.crawler.service.TinderCrawlerService;
 
@@ -29,7 +29,7 @@ public class ControlPanel {
     @Autowired
     TinderCrawlerService tcs;
 
-    @GetMapping("/crawler")
+    @PostMapping("/crawler")
     public Integer crawData() {
         return tcs.crawNewData();
     }
@@ -43,10 +43,20 @@ public class ControlPanel {
         return res;
     }
 
-    @GetMapping("/sync-verdict")
+    @PostMapping("/sync-verdict")
     @SneakyThrows
-    public Object syncVerdict(@RequestParam("id") String id) {
+    public Object syncVerdict(@RequestBody SyncVerdictDTO dto) {
+        String id = dto.getId();
         return tcs.syncVerdict(id);
+    }
+
+    @PostMapping("/sync-all-verdicts")
+    public boolean syncVerdicts() {
+        //TODO: warn user if more than
+        int limit = 50;
+        tcs.syncVerdictBatch(limit);
+        //TODO: Return some sync stats (OK/FAILED)
+        return true;
     }
 
 
@@ -54,5 +64,14 @@ public class ControlPanel {
     public Integer rescoringAll() {
         dao.dropRating();
         return tcs.scoring();
+    }
+
+    @PostMapping("/verdict")
+    @SneakyThrows
+    public boolean verdict(@RequestBody SetVerdictDTO dto) {
+        String id = dto.getId();
+        VerdictEnum verdict = dto.getVerdict();
+        dao.setVerdict(id, verdict);
+        return true;
     }
 }

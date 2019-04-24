@@ -1,3 +1,6 @@
+server:
+  tomcat:
+    uri-encoding:
 spring:
   thymeleaf:
     cache: false

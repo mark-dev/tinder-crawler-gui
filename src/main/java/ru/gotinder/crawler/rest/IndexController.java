@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
-import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 import ru.gotinder.crawler.service.FacebookGateway;
 import ru.gotinder.crawler.service.TinderCrawlerService;
 
@@ -33,54 +32,67 @@ public class IndexController {
     @Autowired
     TinderCrawlerService tcs;
 
-    @GetMapping("/")
-    public String main(Model model,
-                       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                       @RequestParam(value = "size", required = false, defaultValue = "5") Integer size,
-                       @RequestParam(value = "type", required = false, defaultValue = "ALL") CrawlerListTypes type) {
-        List<CrawlerDataDTO> users = Collections.emptyList();
-        Integer count = 0;
-        boolean displaySync = false;
-        switch (type) {
-            case ALL:
-                users = dao.topByRating(page, size);
-                count = dao.countTopByRating();
-                break;
-            case LATEST:
-                users = dao.loadLatest(page, size);
-                count = dao.countLatest();
-                break;
-            case VERDICTED:
-                users = dao.loadVerdictedButNotSynced(page, size);
-                count = dao.countVerdicted();
-                displaySync = true;
-                break;
-            case RECS_DUPLICATED:
-                users = dao.loadRecsDuplicated(page, size);
-                count = dao.countRecsDuplicated();
-                displaySync = true;
-                break;
-        }
-        model.addAttribute("sync", displaySync);
+
+    @GetMapping({"latest"})
+    public String latest(Model model,
+                         @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                         @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+        List<CrawlerDataDTO> users = dao.loadLatest(page, size);
+        Integer count = dao.countLatest();
         model.addAttribute("users", users);
         model.addAttribute("count", count);
-        model.addAttribute("type", type);
+        model.addAttribute("size", size);
+        model.addAttribute("page", page);
+
+        return "latest";
+    }
+
+    @GetMapping({"verdicted"})
+    public String verdicted(Model model,
+                            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                            @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+        List<CrawlerDataDTO> users = dao.loadVerdictedButNotSynced(page, size);
+        Integer count = dao.countVerdicted();
+        model.addAttribute("users", users);
+        model.addAttribute("count", count);
+        model.addAttribute("size", size);
+        model.addAttribute("page", page);
+
+        return "verdicted";
+    }
+
+    @GetMapping({"likes"})
+    public String likes(Model model,
+                        @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+        List<CrawlerDataDTO> users = dao.loadRecsDuplicated(page, size);
+        Integer count = dao.countRecsDuplicated();
+        model.addAttribute("users", users);
+        model.addAttribute("count", count);
+        model.addAttribute("size", size);
+        model.addAttribute("page", page);
+
+        return "likes";
+    }
+
+    @GetMapping({"/"})
+    @SneakyThrows
+    public String index(Model model,
+                        @RequestParam(value = "q", required = false, defaultValue = "") String search,
+                        @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+
+        List<CrawlerDataDTO> users = dao.topByRating(search, page, size);
+        //TODO: search сюда передаем еще.
+        //TODO: Пора юзать Spring Data и Specifications..
+
+        Integer count = dao.countTopByRating(search);
+
+        model.addAttribute("users", users);
+        model.addAttribute("count", count);
         model.addAttribute("size", size);
         model.addAttribute("page", page);
         return "index";
-    }
-
-    @GetMapping("/verdict")
-    @SneakyThrows
-    public String verdict(@RequestParam("id") String id, @RequestParam("verdict") VerdictEnum verdict) {
-        dao.setVerdict(id, verdict);
-        return "redirect:/";
-    }
-
-    @GetMapping("/refresh-token")
-    public String refreshToken() {
-        facebookGateway.refreshToken();
-        return "redirect:/";
     }
 
     @GetMapping("/user/{id}")
@@ -92,9 +104,4 @@ public class IndexController {
         return "index";
     }
 
-    @GetMapping("/sync-verdicts")
-    public String syncVerdicts() {
-        tcs.syncVerdictBatch(50);
-        return "redirect:/";
-    }
 }

@@ -44,8 +44,9 @@ public class TinderCrawlerService {
         Tinder api = getAPI();
         List<CrawlerDataDTO> dtos = dao.loadVerdictedButNotSynced(0, size);
         for (CrawlerDataDTO d : dtos) {
-            log.info("Sync verdict {}", d);
-            Object o = syncVerdict(d, api);
+
+            Object response = syncVerdict(d, api);
+            log.info("Sync verdict user: {}, verdict:{}, response: {}", d.getId(), d.getVerdict(), response);
             Thread.sleep(1000);
         }
     }
@@ -87,7 +88,7 @@ public class TinderCrawlerService {
                     break;
                 case SUPERLIKE:
                     SuperLikeResponse s = api.superLike(obj.getId());
-                    ret = s;
+                    ret = s.getSuperLike();
                     success = s.getSuperLike().isSuccessfully();
                     break;
                 case UNDEFINED:

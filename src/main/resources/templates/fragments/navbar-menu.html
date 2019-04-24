@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="inner" th:fragment="menu">
+    <script>
+        function runCrawler() {
+            $.post({
+                url: '/cp/crawler',
+                success: function (data) {
+                    alert("Crawler OK: " + data.toString());
+                }
+            });
+        }
+
+        function syncVerdicts() {
+            $.post({
+                url: '/cp/sync-all-verdicts',
+                success: function (data) {
+                    alert("Sync verdict OK: " + data.toString());
+                }
+            });
+        }
+
+    </script>
+    <!-- Menu -->
+    <nav id="menu">
+        <header class="major">
+            <h2>Меню</h2>
+        </header>
+        <ul>
+            <li>
+                <span>
+                  <img src="/img/dump.png"
+                       data-toggle="tooltip"
+                       data-placement="top"
+                       title="Загрузить новые рекомендации"
+                       onclick="runCrawler()"
+                       class="clickable-element"
+                       style="max-height: 32px; max-width: 32px;"/>
+
+                    <img src="/img/cloud-sync.png"
+                         data-toggle="tooltip"
+                         data-placement="top"
+                         title="Синхронизировать вердикты"
+                         onclick="syncVerdicts()"
+                         class="clickable-element"
+                         style="max-height: 32px; max-width: 32px;"/>
+                </span>
+            </li>
+            <li><a class="icon fa-list menu-item" href="/">Список</a></li>
+            <li><a class="icon fa-newspaper-o menu-item" href="/latest">Новые</a></li>
+            <li><a class="icon fa-heart-o menu-item" href="/likes">Лайки?</a></li>
+            <li><a class="icon fa-thumbs-up menu-item" href="/verdicted">Синхронизация</a></li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html>

@@ -6,16 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
     <link rel="stylesheet" href="/assets/css/main.css"/>
     <link rel="stylesheet" href="/assets/css/app.css"/>
-    <script>
-        function redirectToSearchResults() {
-            var queryTest = $("#search-field").val();
-            var redirectUri = "/?q=" + queryTest;
-            console.log("Redirecting to: " + redirectUri);
-            window.location.href = redirectUri;
-        }
-    </script>
 </head>
-
 <body class="is-preload">
 
 <!-- Wrapper -->
@@ -27,15 +18,12 @@
 
             <!-- Header -->
             <header id="header">
-                <a href="/" class="logo"><strong>Список</strong></a>
+                <a href="/" class="logo"><strong>Синхронизация вердиктов</strong></a>
             </header>
 
             <!-- Content -->
             <section>
-                <!--TODO: Поиск сделать-->
-<!--                <input type="text" name="query" id="search-field" placeholder="Search"/>-->
-<!--                <a href="#" class="button primary icon fa-search" onclick="redirectToSearchResults()">Icon</a>-->
-                <div class="container" th:insert="~{fragments/userlist::auserlist}"></div>
+               <div class="container" th:insert="~{fragments/userlist::auserlist}"></div>
             </section>
         </div>
     </div>
