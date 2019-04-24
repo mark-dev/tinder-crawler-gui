@@ -102,6 +102,10 @@ public class CrawlerDAO {
         template.batchUpdate(SQLHelper.UPDATE_RATING, new UpdateRatingPreparedStatementSetter(ratingMap));
     }
 
+    public void dropRating() {
+        template.update(SQLHelper.DROP_RATING);
+    }
+
     public Integer countUnrated() {
         return template.queryForObject(SQLHelper.COUNT_UNRATED, Integer.class);
     }

@@ -48,4 +48,11 @@ public class ControlPanel {
     public Object syncVerdict(@RequestParam("id") String id) {
         return tcs.syncVerdict(id);
     }
+
+
+    @GetMapping("/rescoring")
+    public Integer rescoringAll() {
+        dao.dropRating();
+        return tcs.scoring();
+    }
 }

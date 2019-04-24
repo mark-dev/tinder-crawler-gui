@@ -107,7 +107,7 @@ public class TinderCrawlerService {
         return ret;
     }
 
-    private Integer scoring() {
+    public Integer scoring() {
         Integer unratedBefore = dao.countUnrated();
 
         List<CrawlerDataDTO> users = null;

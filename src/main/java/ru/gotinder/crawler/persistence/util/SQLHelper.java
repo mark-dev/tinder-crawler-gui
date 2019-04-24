@@ -6,6 +6,8 @@ public interface SQLHelper {
             " VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET bio = EXCLUDED.bio,recs_duplicate_count = crawler_data.recs_duplicate_count + 1, rating = EXCLUDED.rating, birthday = EXCLUDED.birthday,name = EXCLUDED.name, content_hash = EXCLUDED.content_hash, s_number = EXCLUDED.s_number, photos = EXCLUDED.photos, distance = EXCLUDED.distance,updated_at = now()";
     String UPDATE_RATING = "UPDATE crawler_data SET rating = ? WHERE id = ?";
 
+    String DROP_RATING = "UPDATE crawler_data SET rating = -1";
+
     String SET_VERDICT = "UPDATE crawler_data SET verdict = ? WHERE id = ?";
     String SET_VERDICT_SYNC_TIME = "UPDATE crawler_data SET verdict_sync_at = now() WHERE id = ?";
 
