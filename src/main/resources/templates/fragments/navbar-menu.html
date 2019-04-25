@@ -3,11 +3,13 @@
 <body>
 <div class="inner" th:fragment="menu">
     <script>
+
+
         function runCrawler() {
             $.post({
                 url: '/cp/crawler',
                 success: function (data) {
-                    alert("Crawler OK: " + data.toString());
+                    alert("Crawler finished: " + JSON.stringify(data));
                 }
             });
         }
@@ -16,12 +18,36 @@
             $.post({
                 url: '/cp/sync-all-verdicts',
                 success: function (data) {
-                    alert("Sync verdict OK: " + data.toString());
+                    alert("Sync verdict finished: " + JSON.stringify(data));
                 }
             });
         }
 
+        function redirectToSearchResults() {
+            var searchField = $('#search-field');
+            var queryTest = searchField.val().toLowerCase();
+            if (queryTest.length > 0) {
+                var redirectUri = "/?q=" + queryTest  + "&size=50";
+                console.log("Redirecting to: " + redirectUri);
+                window.location.href = redirectUri;
+            }
+        }
+
+        $(document).ready(function () {
+            var searchField = $('#search-field');
+            searchField.keypress(function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if (keycode == '13') {
+                    redirectToSearchResults();
+                }
+            });
+        });
+
     </script>
+    <section id="search" class="alt">
+        <input type="text" name="query" id="search-field" placeholder="Поиск"/>
+    </section>
+
     <!-- Menu -->
     <nav id="menu">
         <header class="major">

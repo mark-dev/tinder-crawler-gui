@@ -37,12 +37,12 @@
     <div th:replace="~{fragments/paging::pagingcontrol}"></div>
     <!--@thymesVar id="adminViewDTO" type="test.view.AdminViewDTO"-->
     <!--/*@thymesVar id="users" type="java.util.List<ru.gotinder.crawler.persistence.dto.CrawlerDataDTO>"*/-->
-    <div class="container-fluid" th:each="u : ${users}">
+    <div class="container" th:each="u : ${users}">
         <!--/* Workaround for bug https://youtrack.jetbrains.com/issue/IDEA-132738 -->
         <!--@thymesVar id="u" type="ru.gotinder.crawler.persistence.dto.CrawlerDataDTO"-->
         <!--*/-->
         <div class="row" th:id="${'user-row-container-' + u.getId()}">
-            <div class="col-md-3">
+            <div class="col-3">
                 <div>
                     <a
                             th:href="@{'/user/'+${u.getId()}}"
@@ -107,7 +107,7 @@
                     >
                 </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-9">
                 <span th:text="${u.getBio()}"></span>
                 <details>
                     <summary>More photos</summary>

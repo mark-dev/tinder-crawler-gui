@@ -1,16 +1,22 @@
 package ru.gotinder.crawler.rest;
 
+import com.djm.tinder.like.Like;
+import com.djm.tinder.like.SuperLike;
 import com.djm.tinder.like.SuperLikeResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.gotinder.crawler.common.SyncVerdictResponse;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 import ru.gotinder.crawler.rest.dto.SetVerdictDTO;
+import ru.gotinder.crawler.rest.dto.SyncAllVerdictsDTO;
 import ru.gotinder.crawler.rest.dto.SyncVerdictDTO;
 import ru.gotinder.crawler.service.FacebookGateway;
 import ru.gotinder.crawler.service.TinderCrawlerService;
+
+import java.util.List;
 
 
 @RestController
@@ -51,12 +57,12 @@ public class ControlPanel {
     }
 
     @PostMapping("/sync-all-verdicts")
-    public boolean syncVerdicts() {
-        //TODO: warn user if more than
+    public SyncAllVerdictsDTO syncVerdicts() {
+        //TODO: Предупреждать если больше накопилось чем limit. Это сделанно чтобы не заспамить запросами
         int limit = 50;
-        tcs.syncVerdictBatch(limit);
-        //TODO: Return some sync stats (OK/FAILED)
-        return true;
+        List<SyncVerdictResponse> responses = tcs.syncVerdictBatch(limit);
+
+        return calculateSyncVerdictStats(responses);
     }
 
 
@@ -73,5 +79,28 @@ public class ControlPanel {
         VerdictEnum verdict = dto.getVerdict();
         dao.setVerdict(id, verdict);
         return true;
+    }
+
+    private SyncAllVerdictsDTO calculateSyncVerdictStats(List<SyncVerdictResponse> responses) {
+        int success = 0, match = 0, failed = 0;
+        for (SyncVerdictResponse r : responses) {
+            if (r.isSuccess()) {
+                success++;
+                boolean isMatch = false;
+
+                if (r.getTinderResponse() instanceof Like) {
+                    isMatch = ((Like) r.getTinderResponse()).isMatch();
+
+                } else if (r.getTinderResponse() instanceof SuperLike) {
+                    isMatch = ((SuperLike) r.getTinderResponse()).isMatch();
+                }
+
+                if (isMatch) {
+                    match++;
+                }
+            } else
+                failed++;
+        }
+        return new SyncAllVerdictsDTO(success, failed, match);
     }
 }

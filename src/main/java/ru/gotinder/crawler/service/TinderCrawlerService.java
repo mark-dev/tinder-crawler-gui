@@ -9,11 +9,13 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.gotinder.crawler.common.SyncVerdictResponse;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 import ru.gotinder.crawler.scoring.RatingEvaluator;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -40,15 +42,18 @@ public class TinderCrawlerService {
     }
 
     @SneakyThrows
-    public void syncVerdictBatch(int size) {
+    public List<SyncVerdictResponse> syncVerdictBatch(int size) {
         Tinder api = getAPI();
         List<CrawlerDataDTO> dtos = dao.loadVerdictedButNotSynced(0, size);
+        List<SyncVerdictResponse> responses = new ArrayList<>(dtos.size());
         for (CrawlerDataDTO d : dtos) {
 
-            Object response = syncVerdict(d, api);
-            log.info("Sync verdict user: {}, verdict:{}, response: {}", d.getId(), d.getVerdict(), response);
-            Thread.sleep(1000);
+            SyncVerdictResponse vsr = syncVerdict(d, api);
+            log.info("Sync verdict user: {}, verdict:{}, response: {}", d.getId(), d.getVerdict(), vsr);
+            responses.add(vsr);
+            TimeUnit.MILLISECONDS.sleep(1000);
         }
+        return responses;
     }
 
 
@@ -59,7 +64,7 @@ public class TinderCrawlerService {
         return scoring();
     }
 
-    public Object syncVerdict(String id) {
+    public SyncVerdictResponse syncVerdict(String id) {
         CrawlerDataDTO obj = dao.byId(id).orElseThrow(() -> new RuntimeException("Object not found, id: " + id));
         Tinder api = getAPI();
 
@@ -67,7 +72,7 @@ public class TinderCrawlerService {
 
     }
 
-    public Object syncVerdict(CrawlerDataDTO obj, Tinder api) {
+    public SyncVerdictResponse syncVerdict(CrawlerDataDTO obj, Tinder api) {
         boolean success = false;
         Object ret = null;
         try {
@@ -105,7 +110,8 @@ public class TinderCrawlerService {
             log.info("{} : sync verdict failed", obj);
         }
 
-        return ret;
+        SyncVerdictResponse response = new SyncVerdictResponse(success, ret);
+        return response;
     }
 
     public Integer scoring() {
