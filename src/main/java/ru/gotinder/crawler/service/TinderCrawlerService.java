@@ -8,6 +8,7 @@ import com.djm.tinder.user.User;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.gotinder.crawler.common.SyncVerdictResponse;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
@@ -20,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class TinderCrawlerService {
-    public static final int CRAWLER_LOOPS = 4;
 
     @Autowired
     FacebookGateway fb;
@@ -33,8 +33,13 @@ public class TinderCrawlerService {
 
     private Integer apiQueries = 0;
 
-    @SneakyThrows
+    @Value("${tinder.crawler.rating-print-treshold}")
+    private Integer ratingPrintTreshold;
 
+    @Value("${tinder.crawler.loops}")
+    private Integer crawlerLoops;
+
+    @SneakyThrows
     //TODO: caching?
     public Tinder getAPI() {
         Tinder api = Tinder.fromAccessToken(fb.getToken());
@@ -58,10 +63,14 @@ public class TinderCrawlerService {
 
 
     public Integer crawNewData() {
-        Set<User> collect = collect(CRAWLER_LOOPS);
+        return crawNewData(ratingPrintTreshold);
+    }
+
+    public Integer crawNewData(Integer printRatingTreshold) {
+        Set<User> collect = collect(crawlerLoops);
         ArrayList<User> details = new ArrayList<>(collect);
         dao.saveBatch(details);
-        return scoring();
+        return scoring(printRatingTreshold);
     }
 
     public SyncVerdictResponse syncVerdict(String id) {
@@ -115,6 +124,10 @@ public class TinderCrawlerService {
     }
 
     public Integer scoring() {
+        return scoring(null);
+    }
+
+    public Integer scoring(Integer printRatingTreshold) {
         Integer unratedBefore = dao.countUnrated();
 
         List<CrawlerDataDTO> users = null;
@@ -122,6 +135,9 @@ public class TinderCrawlerService {
             Map<String, Integer> ratingMap = new HashMap<>(users.size());
             for (CrawlerDataDTO u : users) {
                 int rating = evaluator.evaluate(u);
+                if (printRatingTreshold != null && rating >= printRatingTreshold) {
+                    log.info("{} has good rating {}", u.getId(), rating);
+                }
                 ratingMap.put(u.getId(), rating);
             }
             dao.updateRating(ratingMap);

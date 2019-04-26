@@ -27,7 +27,7 @@
             var searchField = $('#search-field');
             var queryTest = searchField.val().toLowerCase();
             if (queryTest.length > 0) {
-                var redirectUri = "/?q=" + queryTest  + "&size=50";
+                var redirectUri = "/?q=" + queryTest + "&size=50";
                 console.log("Redirecting to: " + redirectUri);
                 window.location.href = redirectUri;
             }
@@ -44,8 +44,12 @@
         });
 
     </script>
-    <section id="search" class="alt">
-        <input type="text" name="query" id="search-field" placeholder="Поиск"/>
+    <section class="alt" id="search" th:with="existedQuery=${#request.getParameter('q')}">
+        <input id="search-field"
+               name="query"
+               placeholder="Поиск"
+               th:value="${existedQuery != null ? existedQuery: ''}"
+               type="text"/>
     </section>
 
     <!-- Menu -->

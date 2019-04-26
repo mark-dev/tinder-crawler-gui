@@ -1,3 +1,7 @@
+tinder:
+  crawler:
+    loops: 4
+    rating-print-treshold: 30
 server:
   tomcat:
     uri-encoding:

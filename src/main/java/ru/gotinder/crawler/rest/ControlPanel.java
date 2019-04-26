@@ -2,7 +2,6 @@ package ru.gotinder.crawler.rest;
 
 import com.djm.tinder.like.Like;
 import com.djm.tinder.like.SuperLike;
-import com.djm.tinder.like.SuperLikeResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,28 +24,19 @@ import java.util.List;
 public class ControlPanel {
 
     @Autowired
-    CrawlerDAO dao;
+    private CrawlerDAO dao;
 
 
     @Autowired
-    FacebookGateway facebookGateway;
+    private FacebookGateway facebookGateway;
 
 
     @Autowired
-    TinderCrawlerService tcs;
+    private TinderCrawlerService tcs;
 
     @PostMapping("/crawler")
     public Integer crawData() {
         return tcs.crawNewData();
-    }
-
-
-    @GetMapping("/superlike")
-    @SneakyThrows
-    public SuperLikeResponse superLike(@RequestParam("id") String id) {
-        SuperLikeResponse res = tcs.getAPI().superLike(id);
-        log.info("res: {}", res);
-        return res;
     }
 
     @PostMapping("/sync-verdict")
@@ -65,13 +55,6 @@ public class ControlPanel {
         return calculateSyncVerdictStats(responses);
     }
 
-
-    @GetMapping("/rescoring")
-    public Integer rescoringAll() {
-        dao.dropRating();
-        return tcs.scoring();
-    }
-
     @PostMapping("/verdict")
     @SneakyThrows
     public boolean verdict(@RequestBody SetVerdictDTO dto) {
@@ -80,6 +63,14 @@ public class ControlPanel {
         dao.setVerdict(id, verdict);
         return true;
     }
+
+    //Это чисто для отладки, так-то POST нужно сделать
+    @GetMapping("/rescoring")
+    public Integer rescoringAll() {
+        dao.dropRating();
+        return tcs.scoring();
+    }
+
 
     private SyncAllVerdictsDTO calculateSyncVerdictStats(List<SyncVerdictResponse> responses) {
         int success = 0, match = 0, failed = 0;
