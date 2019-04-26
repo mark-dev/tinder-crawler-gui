@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import ru.gotinder.crawler.common.SyncVerdictResponse;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
-import ru.gotinder.crawler.scoring.RatingEvaluator;
+import ru.gotinder.crawler.scoring.ScoringModelService;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,7 @@ public class TinderCrawlerService {
     CrawlerDAO dao;
 
     @Autowired
-    RatingEvaluator evaluator;
+    ScoringModelService evaluator;
 
     private Integer apiQueries = 0;
 

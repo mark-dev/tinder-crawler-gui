@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class RatingEvaluator {
+public class ScoringModelService {
     private static final Map<String, Integer> KEYWORDS = new HashMap<String, Integer>() {{
         //хобби:
 
