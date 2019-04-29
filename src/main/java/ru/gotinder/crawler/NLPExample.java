@@ -27,7 +27,7 @@ import java.util.Properties;
  */
 
 @Slf4j
-public class NLP {
+public class NLPExample {
     // https://github.com/MANASLU8/CoreNLP
 
 

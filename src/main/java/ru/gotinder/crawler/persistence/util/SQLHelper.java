@@ -19,9 +19,8 @@ public interface SQLHelper {
     String COUNT_BY_RATING = "SELECT count(*) FROM crawler_data WHERE verdict = 0 AND (length(?) = 0 OR bio like '%'|| lower(?) || '%') AND verdict_sync_at is null";
 
     String COUNT_LATEST = "SELECT count(*) from crawler_data WHERE verdict = 0 AND verdict_sync_at is null";
-    String LOAD_LATEST = "select * from crawler_data " +
-            "WHERE verdict = 0 AND verdict_sync_at is null " +
-            "order by date_trunc('day', ts) DESC, rating DESC, ts DESC, length(bio) DESC " +
+    String LOAD_LATEST = "select * from crawler_data WHERE verdict = 0 AND verdict_sync_at is null " +
+            "order by date_trunc('day', GREATEST(ts,updated_at)) DESC, rating DESC,recs_duplicate_count DESC, length(bio) DESC " +
             "LIMIT ? OFFSET ?";
 
     String LOAD_VERDICTED_BUT_NOT_SYNCED = "SELECT * FROM crawler_data WHERE verdict <> 0 AND verdict_sync_at is null ORDER BY verdict DESC LIMIT ? OFFSET ?";

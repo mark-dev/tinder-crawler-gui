@@ -1,3 +1,5 @@
+-- POSTGRESQL
+
 create table if not exists crawler_data
 (
 	id text not null

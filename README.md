@@ -1,9 +1,23 @@
-# Useful links
+# Tinder crawler
 
 ![](etc/screenv2.png)
 
-https://github.com/0x13a/tinder-api
+This project allow to sort your tinder recomendations based on [simple keyword scoring model](/src/main/java/ru/gotinder/crawler/scoring/ScoringModelService.java)
 
-https://gist.github.com/taseppa/66fc7239c66ef285ecb28b400b556938
+No more recomendations with empty bio!
 
-https://www.facebook.com/v2.6/dialog/oauth?redirect_uri=fb464891386855067%3A%2F%2Fauthorize%2F&scope=user_birthday%2Cuser_photos%2Cuser_education_history%2Cemail%2Cuser_relationship_details%2Cuser_friends%2Cuser_work_history%2Cuser_likes&response_type=token%2Csigned_request&client_id=464891386855067
+### How it works: 
+
+1. Pull tinder recomendations (+ store in [postgresql database](/sql/schema.sql))
+
+2. Apply scoring model
+
+3. Show results via web gui (top by rating,latest data,search,possible likes)
+
+4. You can like/pass/superlike from gui and sync results with tinder backend.
+
+I inspired to wrote this code after thinking about best strategy of use tinder's free superlike per day. 
+Look for similar math problem - [Secretary problem](https://en.wikipedia.org/wiki/Secretary_problem)
+
+### Dependencies
+[tinder-api](https://github.com/mark-dev/tinder-api)

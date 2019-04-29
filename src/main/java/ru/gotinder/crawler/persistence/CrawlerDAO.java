@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 
 import static ru.gotinder.crawler.persistence.util.SQLHelper.SET_VERDICT_SYNC_TIME;
 
+//TODO: Spring Data + Specifications API
 @Service
 public class CrawlerDAO {
     @Autowired

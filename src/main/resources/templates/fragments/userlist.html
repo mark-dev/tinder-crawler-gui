@@ -41,85 +41,90 @@
         <!--/* Workaround for bug https://youtrack.jetbrains.com/issue/IDEA-132738 -->
         <!--@thymesVar id="u" type="ru.gotinder.crawler.persistence.dto.CrawlerDataDTO"-->
         <!--*/-->
-        <div>
-            <a
-                    style="font-size: large"
-                    th:classappend="
+        <div th:id="${'user-row-container-' + u.getId()}">
+
+
+            <div>
+                <a
+                        style="font-size: large"
+                        th:classappend="
                         ${
                             (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).UNDEFINED ? 'undefined-verdict': '') +
                             (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).SUPERLIKE ? 'superliked' : '') +
                             (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).LIKE ? 'liked' : '') +
                             (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).PASS ? 'disliked' : '')
                         }"
-                    th:href="@{'/user/'+${u.getId()}}"
-                    th:text="${u.getName()}">
-            </a>
-        </div>
-
-        <div class="row" th:id="${'user-row-container-' + u.getId()}">
-            <div class="col-3">
-                <img class="image" th:src="${u.getPhoto().get(0)}"/>
+                        th:href="@{'/user/'+${u.getId()}}"
+                        th:text="${u.getName()}">
+                </a>
             </div>
-            <div class="col-9">
-                <span th:text="${u.getBio()}"></span>
-                <details class="clickable-element" style="font-weight: 900; font-size: 18px">
-                    <summary>Фото</summary>
-                    <div th:each="photo : ${u.getPhoto()}">
-                        <img th:src="${photo}" style="max-height: 600px; max-width: 400px;">
-                    </div>
-                </details>
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col-3">
-                <div>
+            <div class="row">
+                <div class="col-3">
+                    <img class="image" th:src="${u.getPhoto().get(0)}"/>
+                </div>
+                <div class="col-9">
+                    <span th:text="${u.getBio()}"></span>
+                    <details class="clickable-element" style="font-weight: 900; font-size: 18px">
+                        <summary>Фото</summary>
+                        <div th:each="photo : ${u.getPhoto()}">
+                            <img style="max-height: 600px; max-width: 400px;" th:src="${photo}">
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-3">
+                    <div>
                     <span>
                         <img alt="rating" src="/img/analysis.png" title="Рейтинг"/>
                         <span style="font-size: 32px; font-weight: bold" th:text="${u.getRating()}"></span>
                     </span>
-                </div>
-                <div>
+                    </div>
+                    <div>
                     <span>
                          <img alt="years" src="/img/birthday-cake.png" title="Возраст"/>
                         <span th:text="${(T(java.time.LocalDateTime).now().getYear() - u.getBirthday().getYear())}"></span>
                     </span>
-                    <span>
+                        <span>
                         <img alt="dst" src="/img/compass.png" title="Расстояние"/>
                         <span th:text="${u.getDistance()}"></span>
                     </span>
-                    <span>
-                         <img alt="recs-duplicate" src="/img/dart.png" title="Кол-во возаратов"/>
+                        <span>
+                         <img alt="recs-duplicate" src="/img/dart.png" title="Тиндер рекомендует"/>
                         <span th:text="${u.getRecsDuplicateCount()}"></span>
                     </span>
-
+                    </div>
                 </div>
-            </div>
-            <div class="col-9">
+                <div class="col-9">
                  <span style="float:right">
-                   <img
-                           alt="like"
-                           class="clickable-element"
-                           onclick="setVerdict(this.getAttribute('data-user-id'),this.getAttribute('data-verdict'))"
-                           src="/img/like.png"
-                           th:data-user-id="${u.getId()}"
-                           th:data-verdict="${T(ru.gotinder.crawler.persistence.dto.VerdictEnum).LIKE.toString()}"/>
-
                 <img
-                        alt="like"
-                        class="clickable-element"
+                        alt="pass"
+                        class="clickable-element circle-animation-img"
+                        src="/img/pass.png"
                         onclick="setVerdict(this.getAttribute('data-user-id'),this.getAttribute('data-verdict'))"
-                        src="/img/dislike.png"
+                        title="Дизлайк"
                         th:data-user-id="${u.getId()}"
                         th:data-verdict="${T(ru.gotinder.crawler.persistence.dto.VerdictEnum).PASS.toString()}"/>
 
                 <img
                         alt="like"
+                        title="Суперлайк"
                         class="clickable-element"
                         onclick="setVerdict(this.getAttribute('data-user-id'),this.getAttribute('data-verdict'))"
                         src="/img/superlike.png"
                         th:data-user-id="${u.getId()}"
                         th:data-verdict="${T(ru.gotinder.crawler.persistence.dto.VerdictEnum).SUPERLIKE.toString()}"/>
+
+               <img
+                       alt="like"
+                       class="clickable-element"
+                       onclick="setVerdict(this.getAttribute('data-user-id'),this.getAttribute('data-verdict'))"
+                       src="/img/like.png"
+                       th:data-user-id="${u.getId()}"
+                       th:data-verdict="${T(ru.gotinder.crawler.persistence.dto.VerdictEnum).LIKE.toString()}"
+                       title="Лайк"/>
 
                 <img class="clickable-element"
                      data-placement="top"
@@ -132,10 +137,10 @@
                      th:if="${u.getVerdict() != T(ru.gotinder.crawler.persistence.dto.VerdictEnum).UNDEFINED}"
                      th:title="'Синхронизировать результат' + '(' + ${u.getVerdict()} + ')'">
                 </span>
+                </div>
             </div>
+            <hr>
         </div>
-
-        <hr>
     </div>
 
     <div th:replace="~{fragments/paging::pagingcontrol}"></div>
