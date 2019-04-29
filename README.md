@@ -3,6 +3,13 @@
 This project allow to sort your tinder recomendations based on [simple keyword scoring model](/src/main/java/ru/gotinder/crawler/scoring/ScoringModelService.java)
 
 No more recomendations with empty bio!
+<details><summary>Screenshot</summary>
+<p>
+
+ ![](etc/screenv2.png)
+
+</p>
+</details>
 
 ### How it works: 
 
@@ -20,9 +27,3 @@ Look for similar math problem - [Secretary problem](https://en.wikipedia.org/wik
 
 ### Dependencies
 [tinder-api](https://github.com/mark-dev/tinder-api)
-
-<details><summary>Screenshot</summary>
-<p>
-![](etc/screenv2.png)
-</p>
-</details>
