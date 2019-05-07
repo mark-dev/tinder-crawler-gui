@@ -55,7 +55,9 @@
                             (u.getVerdict() == T(ru.gotinder.crawler.persistence.dto.VerdictEnum).PASS ? 'disliked' : '')
                         }"
                         th:href="@{'/user/'+${u.getId()}}"
-                        th:text="${u.getName()}">
+                        th:text="${u.getName()}"
+                        th:title="'Данные получены ' + ${T(java.time.Duration).between(u.getUpdatedAt(),T(java.time.Instant).now()).toDays()} + ' дней назад'"
+                >
                 </a>
             </div>
 

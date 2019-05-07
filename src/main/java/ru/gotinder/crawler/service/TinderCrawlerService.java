@@ -2,6 +2,7 @@ package ru.gotinder.crawler.service;
 
 import com.djm.tinder.Tinder;
 import com.djm.tinder.like.Like;
+import com.djm.tinder.like.SuperLike;
 import com.djm.tinder.like.SuperLikeResponse;
 import com.djm.tinder.pass.Pass;
 import com.djm.tinder.user.User;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import ru.gotinder.crawler.common.SyncVerdictResponse;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
+import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 import ru.gotinder.crawler.scoring.ScoringModelService;
 
 import java.util.*;
@@ -51,10 +53,25 @@ public class TinderCrawlerService {
         Tinder api = getAPI();
         List<CrawlerDataDTO> dtos = dao.loadVerdictedButNotSynced(0, size);
         List<SyncVerdictResponse> responses = new ArrayList<>(dtos.size());
+        boolean hasFailedSuperLikes = false;
         for (CrawlerDataDTO d : dtos) {
+            SyncVerdictResponse vsr;
+            if (d.getVerdict() == VerdictEnum.SUPERLIKE && hasFailedSuperLikes) {
+                log.info("Skipped superlike for {} due already has failed superlike in this batch", d.getId());
+                SuperLike superLike = new SuperLike();
+                superLike.setMatch(false);
+                superLike.setLimitExceeded(true);
+                superLike.setStatus(200);
+                vsr = new SyncVerdictResponse(false, superLike);
+            } else {
+                vsr = syncVerdict(d, api);
+                if (!vsr.isSuccess() && d.getVerdict() == VerdictEnum.SUPERLIKE) {
+                    hasFailedSuperLikes = true;
+                }
+                log.info("Sync verdict user: {}, verdict:{}, response: {}", d.getId(), d.getVerdict(), vsr);
+            }
 
-            SyncVerdictResponse vsr = syncVerdict(d, api);
-            log.info("Sync verdict user: {}, verdict:{}, response: {}", d.getId(), d.getVerdict(), vsr);
+
             responses.add(vsr);
             TimeUnit.MILLISECONDS.sleep(1000);
         }
@@ -115,8 +132,6 @@ public class TinderCrawlerService {
 
         if (success) {
             dao.updateVerdictTimestamp(obj.getId());
-        } else {
-            log.info("{} : sync verdict failed", obj);
         }
 
         SyncVerdictResponse response = new SyncVerdictResponse(success, ret);

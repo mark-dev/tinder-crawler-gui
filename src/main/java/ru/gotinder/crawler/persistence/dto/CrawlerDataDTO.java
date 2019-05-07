@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -23,7 +23,8 @@ public class CrawlerDataDTO {
     private Integer distance;
     private LocalDate birthday;
 
-    private LocalDateTime ts;
+    private Instant ts;
+    private Instant updatedAt;
     private VerdictEnum verdict;
     private boolean vedictSync;
 

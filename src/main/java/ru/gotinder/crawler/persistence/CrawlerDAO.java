@@ -12,8 +12,6 @@ import ru.gotinder.crawler.persistence.util.SQLHelper;
 import ru.gotinder.crawler.persistence.util.UpdateRatingPreparedStatementSetter;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,7 +38,8 @@ public class CrawlerDAO {
         dto.setBirthday(rs.getDate("birthday").toLocalDate());
         dto.setRecsDuplicateCount(rs.getInt("recs_duplicate_count"));
 
-        dto.setTs(LocalDateTime.ofInstant(rs.getTimestamp("ts").toInstant(), ZoneOffset.UTC));
+        dto.setTs(rs.getTimestamp("ts").toInstant());
+        dto.setUpdatedAt(rs.getTimestamp("updated_at").toInstant());
         dto.setVerdict(VERDICT_ENUMS[rs.getInt("verdict")]);
         Timestamp verdictSyncTs = rs.getTimestamp("verdict_sync_at");
         dto.setVedictSync(!rs.wasNull());
