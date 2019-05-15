@@ -17,9 +17,7 @@ public class ScheduledTinderService {
     private CrawlerDAO dao;
 
 
-    public static final long HOUR_MS = 1000L * 60 * 60;
-
-    @Scheduled(fixedRate = HOUR_MS * 2, initialDelay = HOUR_MS)
+    @Scheduled(cron = "${tinder.crawler.cron}")
     public void sheduleCrawNewData() {
         StopWatch sw = new StopWatch();
         sw.start();
@@ -29,7 +27,6 @@ public class ScheduledTinderService {
         sw.stop();
 
         log.info("sheduleCrawNewData() -- END. [new: {}, takes: {} ms]", ctx, sw.getLastTaskTimeMillis());
-
     }
 
     //   @Scheduled(fixedRate = 1000L * 60 * 60 * 24) //раз в 5ч

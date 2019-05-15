@@ -63,11 +63,11 @@ public class FacebookGateway {
             WebElement element = driver.findElement(By.xpath("//*[@id=\"platformDialogForm\"]/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/button[2]"));
             element.submit();
         } catch (NoSuchElementException ex) {
-            //TODO: implement login via hard-coded login&password
             log.info("Facebook submit form not found \n" +
                     "Probably this is your first application run, you need manually login to facebook using special selenium profile of google chrome \n" +
                     "Sign in and restart app");
-            Thread.sleep(10000);
+            //TODO: implement login via hard-coded login&password
+            System.exit(0);
         }
 
 

@@ -64,6 +64,12 @@ public class ControlPanel {
         return true;
     }
 
+    @PostMapping("/hide/{id}")
+    public boolean hide(@PathVariable String id) {
+        dao.hide(id);
+        return true;
+    }
+
     //Это чисто для отладки, так-то POST нужно сделать
     @GetMapping("/rescoring")
     public Integer rescoringAll() {

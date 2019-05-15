@@ -65,8 +65,8 @@ public class IndexController {
     public String likes(Model model,
                         @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
                         @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
-        List<CrawlerDataDTO> users = dao.loadRecsDuplicated(page, size);
-        Integer count = dao.countRecsDuplicated();
+        List<CrawlerDataDTO> users = dao.loadPossibleLikes(page, size);
+        Integer count = dao.countPossibleLikes();
         model.addAttribute("users", users);
         model.addAttribute("count", count);
         model.addAttribute("size", size);

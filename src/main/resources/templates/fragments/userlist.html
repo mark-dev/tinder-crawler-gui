@@ -3,6 +3,16 @@
 <body>
 <div th:if="${!users.isEmpty()}" th:fragment="auserlist">
     <script>
+        function hideUser(user) {
+            $.post({
+                url: '/cp/hide/' + user,
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $('#user-row-container-' + user).remove();
+                }
+            });
+        }
+
         function setVerdict(user, verdict) {
             $.post({
                 url: '/cp/verdict',
@@ -46,6 +56,15 @@
 
             <div>
                 <a
+                        th:title="
+                        ${
+                            'Данные получены ' +
+                            (
+                                updatedAtDuration.toDays() > 0 ?
+                                    updatedAtDuration.toDays() + ' дней назад' :
+                                    ' недавно(' + updatedAtDuration.toHours() + 'ч назад)'
+                            )
+                        }"
                         style="font-size: large"
                         th:classappend="
                         ${
@@ -56,7 +75,7 @@
                         }"
                         th:href="@{'/user/'+${u.getId()}}"
                         th:text="${u.getName()}"
-                        th:title="'Данные получены ' + ${T(java.time.Duration).between(u.getUpdatedAt(),T(java.time.Instant).now()).toDays()} + ' дней назад'"
+                        th:with="updatedAtDuration=${T(java.time.Duration).between(u.getUpdatedAt(),T(java.time.Instant).now())}"
                 >
                 </a>
             </div>
@@ -101,6 +120,13 @@
                 </div>
                 <div class="col-9">
                  <span style="float:right">
+                     <img
+                             alt="hide"
+                             class="clickable-element"
+                             onclick="hideUser(this.getAttribute('data-user-id'))"
+                             src="/img/trash.png"
+                             th:data-user-id="${u.getId()}"
+                             title="Скрыть"/>
                 <img
                         alt="pass"
                         class="clickable-element circle-animation-img"

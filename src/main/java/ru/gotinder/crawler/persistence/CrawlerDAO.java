@@ -67,11 +67,11 @@ public class CrawlerDAO {
     }
 
     public List<CrawlerDataDTO> topByRating(String search, int page, int size) {
-        return template.query(SQLHelper.LOAD_BY_RATING, rowMapper, search, search, size, page * size);
+        return template.query(SQLHelper.TOP_BY_RATING, rowMapper, search, search, size, page * size);
     }
 
     public Integer countTopByRating(String search) {
-        return template.queryForObject(SQLHelper.COUNT_BY_RATING, Integer.class, search, search);
+        return template.queryForObject(SQLHelper.COUNT_TOP_BY_RATING, Integer.class, search, search);
     }
 
     public List<CrawlerDataDTO> loadLatest(int page, int size) {
@@ -90,11 +90,11 @@ public class CrawlerDAO {
         return template.queryForObject(SQLHelper.COUNT_VERDICTED_BUT_NOT_SYNCED, Integer.class);
     }
 
-    public List<CrawlerDataDTO> loadRecsDuplicated(int page, int size) {
-        return template.query(SQLHelper.LOAD_RECS_DUPLICATED, rowMapper, size, page * size);
+    public List<CrawlerDataDTO> loadPossibleLikes(int page, int size) {
+        return template.query(SQLHelper.POSSIBLE_LIKES, rowMapper, size, page * size);
     }
 
-    public Integer countRecsDuplicated() {
+    public Integer countPossibleLikes() {
         return template.queryForObject(SQLHelper.COUNT_RECS_DUPLICATED, Integer.class);
     }
 
@@ -123,5 +123,9 @@ public class CrawlerDAO {
         List<CrawlerDataDTO> res = template.query("SELECT * from crawler_data WHERE id = ?", rowMapper, id);
         if (res.isEmpty()) return Optional.empty();
         return Optional.of(res.get(0));
+    }
+
+    public void hide(String id) {
+        template.update(SQLHelper.SET_HIDDEN, id);
     }
 }
