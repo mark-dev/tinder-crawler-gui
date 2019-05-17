@@ -1,4 +1,4 @@
-# Tinder crawler
+# Tinder crawler: recommendation scoring
 
 I inspired to create this project after thinking about best strategy of use tinder's free superlike per day. 
 

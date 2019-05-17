@@ -29,7 +29,7 @@ public class ScheduledTinderService {
         log.info("sheduleCrawNewData() -- END. [new: {}, takes: {} ms]", ctx, sw.getLastTaskTimeMillis());
     }
 
-    //   @Scheduled(fixedRate = 1000L * 60 * 60 * 24) //раз в 5ч
+    //   @Scheduled(fixedRate = 1000L * 60 * 60 * 24)
     public void syncTinderResults() {
         tcs.syncVerdictBatch(50);
     }
