@@ -70,7 +70,7 @@ public class ControlPanel {
         return true;
     }
 
-    //Это чисто для отладки, так-то POST нужно сделать
+    //TODO: Это чисто для отладки, так-то POST нужно сделать
     @GetMapping("/rescoring")
     public Integer rescoringAll() {
         dao.dropRating();

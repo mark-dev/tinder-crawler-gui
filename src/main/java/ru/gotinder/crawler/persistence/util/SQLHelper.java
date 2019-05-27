@@ -16,12 +16,12 @@ public interface SQLHelper {
     String COUNT_UNRATED = "select count(*) from crawler_data where rating = -1;";
     String LOAD_UNRATED = "SELECT * FROM crawler_data WHERE rating = -1 LIMIT 500";
 
-    String TOP_BY_RATING = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND (length(?) = 0 OR bio like '%'|| lower(?) || '%') AND verdict_sync_at is null ORDER BY rating desc, updated_at DESC LIMIT ? OFFSET ?";
+    String TOP_BY_RATING = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND (length(?) = 0 OR lower(bio) like '%'|| lower(?) || '%') AND verdict_sync_at is null ORDER BY rating desc, updated_at DESC LIMIT ? OFFSET ?";
     String COUNT_TOP_BY_RATING = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND (length(?) = 0 OR bio like '%'|| lower(?) || '%') AND verdict_sync_at is null";
 
-    String COUNT_LATEST = "SELECT count(*) from crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null";
-    String LOAD_LATEST = "select * from crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null " +
-            "order by date_trunc('day', GREATEST(ts,updated_at)) DESC, rating DESC,recs_duplicate_count DESC, length(bio) DESC " +
+    String COUNT_LATEST = "SELECT count(*) from crawler_data WHERE rating > 0 AND hidden = FALSE AND verdict = 0 AND verdict_sync_at is null";
+    String LOAD_LATEST = "select * from crawler_data WHERE rating > 0 AND hidden = FALSE AND verdict = 0 AND verdict_sync_at is null " +
+            "order by date_trunc('day', GREATEST(ts,updated_at)) DESC, rating DESC, length(bio) DESC " +
             "LIMIT ? OFFSET ?";
 
     String LOAD_VERDICTED_BUT_NOT_SYNCED = "SELECT * FROM crawler_data WHERE verdict <> 0 AND verdict_sync_at is null ORDER BY verdict DESC LIMIT ? OFFSET ?";

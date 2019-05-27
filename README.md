@@ -30,3 +30,7 @@ You will no longer see recomendations with empty description!
 
 ### Dependencies
 [my fork of java tinder-api](https://github.com/mark-dev/tinder-api)
+
+### TODO
+
+Page with random recomendations (maybe rating lies?) 
