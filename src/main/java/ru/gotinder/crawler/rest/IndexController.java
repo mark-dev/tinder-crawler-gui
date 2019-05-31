@@ -47,6 +47,19 @@ public class IndexController {
         return "latest";
     }
 
+    @GetMapping({"random"})
+    public String random(Model model) {
+        int loadCtx = 10;
+        List<CrawlerDataDTO> users = dao.loadRandom(loadCtx);
+        model.addAttribute("users", users);
+        model.addAttribute("count", loadCtx);
+        model.addAttribute("size", loadCtx);
+        model.addAttribute("page", 0);
+
+        return "random";
+    }
+
+
     @GetMapping({"verdicted"})
     public String verdicted(Model model,
                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,

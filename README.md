@@ -33,4 +33,3 @@ You will no longer see recomendations with empty description!
 
 ### TODO
 
-Page with random recomendations (maybe rating lies?) 

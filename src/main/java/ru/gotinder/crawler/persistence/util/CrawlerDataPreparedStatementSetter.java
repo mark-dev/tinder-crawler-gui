@@ -10,7 +10,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class CrawlerDataPreparedStatementSetter implements BatchPreparedStatementSetter {
@@ -24,7 +23,7 @@ public class CrawlerDataPreparedStatementSetter implements BatchPreparedStatemen
         ps.setString(1, user.getId());
         ps.setString(2, user.getName());
 
-        Object[] objects = user.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList()).toArray();
+        Object[] objects = user.getPhotos().stream().map(Photo::getUrl).toArray();
         Array photos = ps.getConnection().createArrayOf("text", objects);
         ps.setArray(3, photos);
         ps.setString(4, user.getBio());
@@ -33,7 +32,7 @@ public class CrawlerDataPreparedStatementSetter implements BatchPreparedStatemen
         ps.setDate(7, new Date(user.getBirthDate().getTime()));
         ps.setString(8, user.getContentHash());
         ps.setString(9, user.getsNumber());
-
+        ps.setInt(10, i + 1); //Чтобы отличить значение "0" по умолчанию(не заполненно), от реально значения - первого элемента в массиве (тоже 0)
 
     }
 

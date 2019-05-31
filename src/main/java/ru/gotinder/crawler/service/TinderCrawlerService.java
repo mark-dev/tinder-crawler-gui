@@ -17,7 +17,10 @@ import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 import ru.gotinder.crawler.scoring.ScoringModelService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -84,9 +87,8 @@ public class TinderCrawlerService {
     }
 
     public Integer crawNewData(Integer printRatingTreshold) {
-        Set<User> collect = collect(crawlerLoops);
-        ArrayList<User> details = new ArrayList<>(collect);
-        dao.saveBatch(details);
+        collectAndSaveRecs(crawlerLoops);
+
         return scoring(printRatingTreshold);
     }
 
@@ -162,9 +164,8 @@ public class TinderCrawlerService {
     }
 
     @SneakyThrows
-    private Set<User> collect(int loops) {
+    private void collectAndSaveRecs(int loops) {
         Tinder api = getAPI();
-        Set<User> uniqueUsers = new HashSet<>();
         for (int i = 0; i < loops; i++) {
             log.info("Crawler recs collect loop: {}/{}", i + 1, loops);
             ArrayList<User> recs;
@@ -174,9 +175,8 @@ public class TinderCrawlerService {
                 log.error("Exception while recomendation fetch: {}", ex.getClass());
                 break;
             }
+            dao.saveBatch(recs);
             Thread.sleep(1000);
-            uniqueUsers.addAll(recs);
         }
-        return uniqueUsers;
     }
 }

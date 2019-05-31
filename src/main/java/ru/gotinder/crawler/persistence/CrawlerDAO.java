@@ -74,6 +74,10 @@ public class CrawlerDAO {
         return template.queryForObject(SQLHelper.COUNT_TOP_BY_RATING, Integer.class, search, search);
     }
 
+    public List<CrawlerDataDTO> loadRandom(int size) {
+        return template.query(SQLHelper.LOAD_RANDOM, rowMapper, size);
+    }
+
     public List<CrawlerDataDTO> loadLatest(int page, int size) {
         return template.query(SQLHelper.LOAD_LATEST, rowMapper, size, page * size);
     }
@@ -95,7 +99,7 @@ public class CrawlerDAO {
     }
 
     public Integer countPossibleLikes() {
-        return template.queryForObject(SQLHelper.COUNT_RECS_DUPLICATED, Integer.class);
+        return template.queryForObject(SQLHelper.COUNT_POSSIBLE_LIKES, Integer.class);
     }
 
     public void updateRating(Map<String, Integer> ratingMap) {
