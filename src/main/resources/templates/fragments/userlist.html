@@ -87,13 +87,6 @@
                 <div class="col-9">
                     <span th:text="${u.getBio()}"></span>
 
-                    <details class="clickable-element" style="font-weight: 900; font-size: 18px">
-                        <summary>Фото</summary>
-                        <div th:each="photo : ${u.getPhoto()}">
-                            <img style="max-height: 600px; max-width: 400px;" th:src="${photo}">
-                        </div>
-                    </details>
-
                     <details class="clickable-element" style="font-weight: 900; font-size: 18px"
                              th:if="${!u.getTeasers().isEmpty()}">
                         <summary>Инфо</summary>
@@ -104,6 +97,15 @@
                             </tr>
                         </table>
                     </details>
+
+                    <details class="clickable-element" style="font-weight: 900; font-size: 18px">
+                        <summary>Фото</summary>
+                        <div th:each="photo : ${u.getPhoto()}">
+                            <img style="max-height: 600px; max-width: 400px;" th:src="${photo}">
+                        </div>
+                    </details>
+
+
                 </div>
             </div>
 
