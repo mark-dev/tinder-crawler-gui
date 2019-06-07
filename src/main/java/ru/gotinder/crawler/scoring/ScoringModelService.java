@@ -37,6 +37,7 @@ public class ScoringModelService {
         //Айти
         put("программи", 30);
         put("аналитическ", 30);
+        put("математик", 30);
         put("кот", 10);
         put("IT", 10);
         put("айти", 10);

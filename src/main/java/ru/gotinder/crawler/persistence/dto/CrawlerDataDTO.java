@@ -8,11 +8,12 @@ import lombok.ToString;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(of = {"id","name","verdict"})
+@ToString(of = {"id", "name", "verdict"})
 public class CrawlerDataDTO {
 
     private String id;
@@ -22,11 +23,14 @@ public class CrawlerDataDTO {
     private Integer rating;
     private Integer distance;
     private LocalDate birthday;
+    private Map<String, String> teasers;
+
 
     private Instant ts;
     private Instant updatedAt;
     private VerdictEnum verdict;
     private boolean vedictSync;
+
 
     //System stuff
     private String contentHash;

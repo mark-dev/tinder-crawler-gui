@@ -10,17 +10,18 @@ create table if not exists crawler_data
     bio                  text,
     ts                   timestamp default now(),
     rating               integer   default 0     not null,
-    distance             integer   default 0     not null,
-    birthday             timestamp               not null,
-    content_hash         text                    not null,
+    distance             integer   default 0           not null,
+    birthday             timestamp                     not null,
+    content_hash         text                          not null,
     s_number             text,
-    recs_duplicate_count integer   default 0     not null,
-    updated_at           timestamp default now() not null,
-    verdict              integer   default 0     not null,
+    recs_duplicate_count integer   default 0           not null,
+    updated_at           timestamp default now()       not null,
+    verdict              integer   default 0           not null,
     verdict_sync_at      timestamp,
-    hidden               boolean   default false not null,
-    avg_batch_rank       int       default 0     not null,
-    avg_batch_rank_idx   int       default 0     not null
+    hidden               boolean   default false       not null,
+    avg_batch_rank       int       default 0           not null,
+    avg_batch_rank_idx   int       default 0           not null,
+    teasers              jsonb     default '{}'::jsonb not null
 );
 
 create unique index if not exists crawler_data_id_uindex

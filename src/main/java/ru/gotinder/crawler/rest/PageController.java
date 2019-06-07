@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/")
-public class IndexController {
+public class PageController {
 
 
     @Autowired
@@ -49,7 +49,7 @@ public class IndexController {
 
     @GetMapping({"random"})
     public String random(Model model) {
-        int loadCtx = 10;
+        int loadCtx = 4;
         List<CrawlerDataDTO> users = dao.loadRandom(loadCtx);
         model.addAttribute("users", users);
         model.addAttribute("count", loadCtx);

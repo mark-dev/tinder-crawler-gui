@@ -2,6 +2,8 @@ package ru.gotinder.crawler.persistence.util;
 
 import com.djm.tinder.user.Photo;
 import com.djm.tinder.user.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 
@@ -10,10 +12,14 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 @AllArgsConstructor
 public class CrawlerDataPreparedStatementSetter implements BatchPreparedStatementSetter {
     private ArrayList<User> data;
+
+    private static final ObjectMapper JSON = new ObjectMapper();
+
 
     @Override
     public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -33,11 +39,28 @@ public class CrawlerDataPreparedStatementSetter implements BatchPreparedStatemen
         ps.setString(8, user.getContentHash());
         ps.setString(9, user.getsNumber());
         ps.setInt(10, i + 1); //Чтобы отличить значение "0" по умолчанию(не заполненно), от реально значения - первого элемента в массиве (тоже 0)
+        ps.setString(11, safeToJson(prepareTeaserMapToSave(user.getTeasers())));
+
 
     }
 
     @Override
     public int getBatchSize() {
         return data.size();
+    }
+
+    private String safeToJson(Object o) {
+        try {
+            return JSON.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            return "{}";
+        }
+    }
+
+    private Map<String, String> prepareTeaserMapToSave(Map<String, String> teasers) {
+        //Никакой полезной нагрузки инстаграм не несет, можно тут отклонировать объект, чтобы не "портить" исходный
+        //Но нам он все равно не нужен, так что просто так.
+        teasers.remove("instagram");
+        return teasers;
     }
 }

@@ -1,6 +1,7 @@
 package ru.gotinder.crawler.persistence;
 
 import com.djm.tinder.user.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,6 +12,7 @@ import ru.gotinder.crawler.persistence.util.CrawlerDataPreparedStatementSetter;
 import ru.gotinder.crawler.persistence.util.SQLHelper;
 import ru.gotinder.crawler.persistence.util.UpdateRatingPreparedStatementSetter;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,8 +26,11 @@ public class CrawlerDAO {
     @Autowired
     private JdbcTemplate template;
 
-    private static final VerdictEnum[] VERDICT_ENUMS = VerdictEnum.values();
+    public static final int POSSIBLE_LIKES_DUPLICATE_TRESHOLD = 10;
+    @Autowired
+    private ObjectMapper om;
 
+    private static final VerdictEnum[] VERDICT_ENUMS = VerdictEnum.values();
     private RowMapper<CrawlerDataDTO> rowMapper = (rs, rowNum) -> {
         String[] photos = (String[]) rs.getArray("photos").getArray();
         CrawlerDataDTO dto = new CrawlerDataDTO();
@@ -37,7 +42,14 @@ public class CrawlerDAO {
         dto.setDistance(rs.getInt("distance"));
         dto.setBirthday(rs.getDate("birthday").toLocalDate());
         dto.setRecsDuplicateCount(rs.getInt("recs_duplicate_count"));
-
+        String teasersStr = rs.getString("teasers");
+        Map<String, String> teasers;
+        try {
+            teasers = om.reader().forType(Map.class).readValue(teasersStr);
+        } catch (IOException e) {
+            teasers = Collections.emptyMap();
+        }
+        dto.setTeasers(teasers);
         dto.setTs(rs.getTimestamp("ts").toInstant());
         dto.setUpdatedAt(rs.getTimestamp("updated_at").toInstant());
         dto.setVerdict(VERDICT_ENUMS[rs.getInt("verdict")]);
@@ -95,11 +107,11 @@ public class CrawlerDAO {
     }
 
     public List<CrawlerDataDTO> loadPossibleLikes(int page, int size) {
-        return template.query(SQLHelper.POSSIBLE_LIKES, rowMapper, size, page * size);
+        return template.query(SQLHelper.POSSIBLE_LIKES, rowMapper, POSSIBLE_LIKES_DUPLICATE_TRESHOLD, size, page * size);
     }
 
     public Integer countPossibleLikes() {
-        return template.queryForObject(SQLHelper.COUNT_POSSIBLE_LIKES, Integer.class);
+        return template.queryForObject(SQLHelper.COUNT_POSSIBLE_LIKES, Integer.class, POSSIBLE_LIKES_DUPLICATE_TRESHOLD);
     }
 
     public void updateRating(Map<String, Integer> ratingMap) {
