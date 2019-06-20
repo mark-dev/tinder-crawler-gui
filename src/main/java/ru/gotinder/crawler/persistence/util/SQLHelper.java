@@ -38,7 +38,7 @@ public interface SQLHelper {
     //TODO: Т.е. предполагаем что если нам дают людей с дистанцией больше чем у нас в настройках, возможно это лайк.
     //TODO: Ну и соответственно учитываем насколько "настойчиво" делает это тиндер.
 //    String POSSIBLE_LIKES = "select * from crawler_data where verdict_sync_at is null order by (recs_duplicate_count*recs_duplicate_count*(CASE WHEN distance <= 10 THEN 1 WHEN distance > 10 THEN 10 END)) DESC LIMIT ? OFFSET ?";
-    String POSSIBLE_LIKES = "select * from crawler_data where verdict = 0 AND verdict_sync_at is null AND date_trunc('day', updated_at) = date_trunc('day',now()) AND avg_batch_rank_idx  > ? order by avg_batch_rank ASC, id ASC LIMIT ? OFFSET ?";
+    String POSSIBLE_LIKES = "select * from crawler_data where verdict = 0 AND verdict_sync_at is null AND date_trunc('day', updated_at) = date_trunc('day',now()) AND avg_batch_rank_idx  > ? order by avg_batch_rank_idx DESC, id ASC LIMIT ? OFFSET ?";
     String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict = 0 AND date_trunc('day', updated_at) = date_trunc('day',now()) AND verdict_sync_at is null AND avg_batch_rank_idx  > ?";
 //    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict_sync_at is null";
 }

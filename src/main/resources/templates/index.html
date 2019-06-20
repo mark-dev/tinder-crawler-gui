@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Tinder crawler</title>
+    <title th:if="${users.isEmpty() || users.size() > 1}">Tinder crawler</title>
+    <title th:if="${users.size() == 1}" th:text="'Tinder Crawler -- '+${users.get(0).getName()}"></title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
     <link rel="stylesheet" href="/assets/css/main.css"/>
@@ -28,8 +29,8 @@
             <!-- Content -->
             <section>
                 <!--TODO: Поиск сделать-->
-<!--                <input type="text" name="query" id="search-field" placeholder="Search"/>-->
-<!--                <a href="#" class="button primary icon fa-search" onclick="redirectToSearchResults()">Icon</a>-->
+                <!--                <input type="text" name="query" id="search-field" placeholder="Search"/>-->
+                <!--                <a href="#" class="button primary icon fa-search" onclick="redirectToSearchResults()">Icon</a>-->
                 <div class="container" th:insert="~{fragments/userlist::auserlist}"></div>
             </section>
         </div>
