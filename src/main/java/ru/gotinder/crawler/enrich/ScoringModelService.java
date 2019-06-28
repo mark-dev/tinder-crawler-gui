@@ -1,4 +1,4 @@
-package ru.gotinder.crawler.scoring;
+package ru.gotinder.crawler.enrich;
 
 import org.springframework.stereotype.Service;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;

@@ -33,7 +33,7 @@ public class CrawlerDataPreparedStatementSetter implements BatchPreparedStatemen
         Array photos = ps.getConnection().createArrayOf("text", objects);
         ps.setArray(3, photos);
         ps.setString(4, user.getBio());
-        ps.setInt(5, -1);
+        ps.setInt(5, -1); //рейтинг
         ps.setInt(6, Math.toIntExact(user.getDistance()));
         ps.setDate(7, new Date(user.getBirthDate().getTime()));
         ps.setString(8, user.getContentHash());

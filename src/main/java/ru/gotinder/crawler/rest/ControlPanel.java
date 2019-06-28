@@ -71,10 +71,10 @@ public class ControlPanel {
     }
 
     //TODO: Это чисто для отладки, так-то POST нужно сделать
-    @GetMapping("/rescoring")
+    @GetMapping("/enrich")
     public Integer rescoringAll() {
-        dao.dropRating();
-        return tcs.scoring();
+        dao.dropEnrichFlag();
+        return tcs.enrichData();
     }
 
 

@@ -8,18 +8,18 @@ public interface SQLHelper {
             //https://stackoverflow.com/questions/11074665/calculate-cumulative-average-mean
             "                      WHEN crawler_data.avg_batch_rank_idx = 0 THEN EXCLUDED.avg_batch_rank" +
             "                      ELSE ((crawler_data.avg_batch_rank_idx / (crawler_data.avg_batch_rank_idx + 1)::float) * crawler_data.avg_batch_rank) + (EXCLUDED.avg_batch_rank / (crawler_data.avg_batch_rank_idx + 1)::float) END," +
-            "avg_batch_rank_idx = crawler_data.avg_batch_rank_idx + 1, teasers = (EXCLUDED.teasers)::jsonb, bio = EXCLUDED.bio,recs_duplicate_count = crawler_data.recs_duplicate_count + 1, rating = EXCLUDED.rating, birthday = EXCLUDED.birthday,name = EXCLUDED.name, content_hash = EXCLUDED.content_hash, s_number = EXCLUDED.s_number, photos = EXCLUDED.photos, distance = EXCLUDED.distance,updated_at = now()";
-    String UPDATE_RATING = "UPDATE crawler_data SET rating = ? WHERE id = ?";
+            "avg_batch_rank_idx = crawler_data.avg_batch_rank_idx + 1, teasers = (EXCLUDED.teasers)::jsonb, bio = EXCLUDED.bio,recs_duplicate_count = crawler_data.recs_duplicate_count + 1, enrich_required = true, rating = EXCLUDED.rating, birthday = EXCLUDED.birthday,name = EXCLUDED.name, content_hash = EXCLUDED.content_hash, s_number = EXCLUDED.s_number, photos = EXCLUDED.photos, distance = EXCLUDED.distance,updated_at = now()";
+    String ENRICH_DATA = "UPDATE crawler_data SET rating = ?, height = ?, enrich_required = false WHERE id = ?";
     String SET_HIDDEN = "UPDATE crawler_data SET hidden = true WHERE id = ?";
 
-    String DROP_RATING = "UPDATE crawler_data SET rating = -1";
+    String DROP_ENRICH_FLAG = "UPDATE crawler_data SET enrich_required = true";
 
     String SET_VERDICT = "UPDATE crawler_data SET verdict = ? WHERE id = ?";
     String SET_VERDICT_SYNC_TIME = "UPDATE crawler_data SET verdict_sync_at = now() WHERE id = ?";
 
 
-    String COUNT_UNRATED = "select count(*) from crawler_data where rating = -1;";
-    String LOAD_UNRATED = "SELECT * FROM crawler_data WHERE rating = -1 LIMIT 500";
+    String COUNT_ENRICH_REQUIRED = "select count(*) from crawler_data where enrich_required;";
+    String LOAD_ENRICH_REQUIRED = "SELECT * FROM crawler_data WHERE enrich_required LIMIT ?";
 
     String TOP_BY_RATING = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND (length(?) = 0 OR lower(bio) like '%'|| lower(?) || '%') AND verdict_sync_at is null ORDER BY rating desc, updated_at DESC, id ASC LIMIT ? OFFSET ?";
     String COUNT_TOP_BY_RATING = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND (length(?) = 0 OR bio like '%'|| lower(?) || '%') AND verdict_sync_at is null";
@@ -32,7 +32,7 @@ public interface SQLHelper {
     String LOAD_VERDICTED_BUT_NOT_SYNCED = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict <> 0 AND verdict_sync_at is null ORDER BY verdict DESC, id ASC LIMIT ? OFFSET ?";
     String COUNT_VERDICTED_BUT_NOT_SYNCED = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict <> 0 AND verdict_sync_at is null";
 
-    String LOAD_RANDOM = "select * from crawler_data where  hidden = FALSE AND rating > 0 and verdict_sync_at is null order by random() limit ?";
+    String LOAD_RANDOM = "select * from crawler_data where hidden = FALSE and now() - updated_at <= interval '7 days' and height > 0 and height < 170 and verdict = 0 order by random() limit ?";
 
     //TODO: Условие в запросе(case) от настроек профиля тиндер должно зависеть
     //TODO: Т.е. предполагаем что если нам дают людей с дистанцией больше чем у нас в настройках, возможно это лайк.

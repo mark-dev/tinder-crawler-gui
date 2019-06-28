@@ -12,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.gotinder.crawler.common.SyncVerdictResponse;
+import ru.gotinder.crawler.enrich.HeightExtractorService;
+import ru.gotinder.crawler.enrich.ScoringModelService;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
+import ru.gotinder.crawler.persistence.dto.EnrichDataDTO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
-import ru.gotinder.crawler.scoring.ScoringModelService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +36,10 @@ public class TinderCrawlerService {
     CrawlerDAO dao;
 
     @Autowired
-    ScoringModelService evaluator;
+    ScoringModelService scoringService;
+
+    @Autowired
+    HeightExtractorService heightExtractorService;
 
     private Integer apiQueries = 0;
 
@@ -89,7 +94,7 @@ public class TinderCrawlerService {
     public Integer crawNewData(Integer printRatingTreshold) {
         collectAndSaveRecs(crawlerLoops);
 
-        return scoring(printRatingTreshold);
+        return enrichData(printRatingTreshold);
     }
 
     public SyncVerdictResponse syncVerdict(String id) {
@@ -140,27 +145,41 @@ public class TinderCrawlerService {
         return response;
     }
 
-    public Integer scoring() {
-        return scoring(null);
+    public Integer enrichData() {
+        return enrichData(null);
     }
 
-    public Integer scoring(Integer printRatingTreshold) {
-        Integer unratedBefore = dao.countUnrated();
+    public Integer enrichData(Integer printRatingTreshold) {
+
+        Integer enrichRequiredCountBefore = dao.countEnrichRequired();
+        int limit = 500;
+        int step = 0;
+        int processed = 0;
 
         List<CrawlerDataDTO> users = null;
-        while (!(users = dao.loadUnrated()).isEmpty()) {
-            Map<String, Integer> ratingMap = new HashMap<>(users.size());
+        while (!(users = dao.loadEnrichRequired(limit)).isEmpty()) {
+            Map<String, EnrichDataDTO> ratingMap = new HashMap<>(users.size());
             for (CrawlerDataDTO u : users) {
-                int rating = evaluator.evaluate(u);
+
+                Integer rating = scoringService.evaluate(u);
                 if (printRatingTreshold != null && rating >= printRatingTreshold) {
                     log.info("{} has good rating {}", u.getId(), rating);
                 }
-                ratingMap.put(u.getId(), rating);
+
+                Integer height = heightExtractorService.extractHeight(u);
+
+
+                EnrichDataDTO dto = new EnrichDataDTO(rating, height);
+                ratingMap.put(u.getId(), dto);
+
             }
-            dao.updateRating(ratingMap);
+            dao.enrichData(ratingMap);
+            processed += users.size();
+            log.info("Enrich step finished {}/{}", processed, enrichRequiredCountBefore);
         }
-        Integer unratedAfter = dao.countUnrated();
-        return unratedBefore - unratedAfter;
+
+        Integer enrichRequiredAfter = dao.countEnrichRequired();
+        return enrichRequiredCountBefore - enrichRequiredAfter;
     }
 
     @SneakyThrows

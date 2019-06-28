@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
+import ru.gotinder.crawler.persistence.dto.EnrichDataDTO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 import ru.gotinder.crawler.persistence.util.CrawlerDataPreparedStatementSetter;
 import ru.gotinder.crawler.persistence.util.SQLHelper;
@@ -74,8 +75,8 @@ public class CrawlerDAO {
         template.batchUpdate(SQLHelper.INSERT_CRAWLER_DATA, new CrawlerDataPreparedStatementSetter(asArrayList));
     }
 
-    public List<CrawlerDataDTO> loadUnrated() {
-        return template.query(SQLHelper.LOAD_UNRATED, rowMapper);
+    public List<CrawlerDataDTO> loadEnrichRequired(int limit) {
+        return template.query(SQLHelper.LOAD_ENRICH_REQUIRED, rowMapper, 500);
     }
 
     public List<CrawlerDataDTO> topByRating(String search, int page, int size) {
@@ -114,16 +115,16 @@ public class CrawlerDAO {
         return template.queryForObject(SQLHelper.COUNT_POSSIBLE_LIKES, Integer.class, POSSIBLE_LIKES_DUPLICATE_TRESHOLD);
     }
 
-    public void updateRating(Map<String, Integer> ratingMap) {
-        template.batchUpdate(SQLHelper.UPDATE_RATING, new UpdateRatingPreparedStatementSetter(ratingMap));
+    public void enrichData(Map<String, EnrichDataDTO> ratingMap) {
+        template.batchUpdate(SQLHelper.ENRICH_DATA, new UpdateRatingPreparedStatementSetter(ratingMap));
     }
 
-    public void dropRating() {
-        template.update(SQLHelper.DROP_RATING);
+    public void dropEnrichFlag() {
+        template.update(SQLHelper.DROP_ENRICH_FLAG);
     }
 
-    public Integer countUnrated() {
-        return template.queryForObject(SQLHelper.COUNT_UNRATED, Integer.class);
+    public Integer countEnrichRequired() {
+        return template.queryForObject(SQLHelper.COUNT_ENRICH_REQUIRED, Integer.class);
     }
 
     public void setVerdict(String id, VerdictEnum v) {
