@@ -2,13 +2,13 @@ package ru.gotinder.crawler.persistence.util;
 
 //TODO: Уже начинает попахивать спринг датой. А не простым приложением с 1 запросом.
 public interface SQLHelper {
-    String INSERT_CRAWLER_DATA = "INSERT INTO crawler_data(id,name,photos,bio,rating,distance,birthday,content_hash,s_number,avg_batch_rank,teasers,avg_batch_rank_idx) " +
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?::jsonb,1) ON CONFLICT(id) DO UPDATE " +
+    String INSERT_CRAWLER_DATA = "INSERT INTO crawler_data(id,name,photos,bio,longest_bio,rating,distance,birthday,content_hash,s_number,avg_batch_rank,teasers,avg_batch_rank_idx) " +
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?::jsonb,1) ON CONFLICT(id) DO UPDATE " +
             "SET avg_batch_rank  = CASE " +
             //https://stackoverflow.com/questions/11074665/calculate-cumulative-average-mean
             "                      WHEN crawler_data.avg_batch_rank_idx = 0 THEN EXCLUDED.avg_batch_rank" +
             "                      ELSE ((crawler_data.avg_batch_rank_idx / (crawler_data.avg_batch_rank_idx + 1)::float) * crawler_data.avg_batch_rank) + (EXCLUDED.avg_batch_rank / (crawler_data.avg_batch_rank_idx + 1)::float) END," +
-            "avg_batch_rank_idx = crawler_data.avg_batch_rank_idx + 1, teasers = (EXCLUDED.teasers)::jsonb, bio = EXCLUDED.bio,recs_duplicate_count = crawler_data.recs_duplicate_count + 1, enrich_required = true, rating = EXCLUDED.rating, birthday = EXCLUDED.birthday,name = EXCLUDED.name, content_hash = EXCLUDED.content_hash, s_number = EXCLUDED.s_number, photos = EXCLUDED.photos, distance = EXCLUDED.distance,updated_at = now()";
+            "avg_batch_rank_idx = crawler_data.avg_batch_rank_idx + 1, teasers = (EXCLUDED.teasers)::jsonb, bio = EXCLUDED.bio, longest_bio = (CASE WHEN length(EXCLUDED.bio) > length(crawler_data.longest_bio) THEN EXCLUDED.bio ELSE crawler_data.longest_bio END), enrich_required = true, rating = EXCLUDED.rating, birthday = EXCLUDED.birthday,name = EXCLUDED.name, content_hash = EXCLUDED.content_hash, s_number = EXCLUDED.s_number, photos = EXCLUDED.photos, distance = EXCLUDED.distance,updated_at = now()";
     String ENRICH_DATA = "UPDATE crawler_data SET rating = ?, height = ?, enrich_required = false WHERE id = ?";
     String SET_HIDDEN = "UPDATE crawler_data SET hidden = true WHERE id = ?";
 

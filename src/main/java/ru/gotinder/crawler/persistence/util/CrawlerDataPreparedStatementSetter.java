@@ -33,13 +33,14 @@ public class CrawlerDataPreparedStatementSetter implements BatchPreparedStatemen
         Array photos = ps.getConnection().createArrayOf("text", objects);
         ps.setArray(3, photos);
         ps.setString(4, user.getBio());
-        ps.setInt(5, -1); //рейтинг
-        ps.setInt(6, Math.toIntExact(user.getDistance()));
-        ps.setDate(7, new Date(user.getBirthDate().getTime()));
-        ps.setString(8, user.getContentHash());
-        ps.setString(9, user.getsNumber());
-        ps.setInt(10, i + 1); //Чтобы отличить значение "0" по умолчанию(не заполненно), от реально значения - первого элемента в массиве (тоже 0)
-        ps.setString(11, safeToJson(prepareTeaserMapToSave(user.getTeasers())));
+        ps.setString(5, user.getBio()); //самое длинное описание
+        ps.setInt(6, -1); //рейтинг
+        ps.setInt(7, Math.toIntExact(user.getDistance()));
+        ps.setDate(8, new Date(user.getBirthDate().getTime()));
+        ps.setString(9, user.getContentHash());
+        ps.setString(10, user.getsNumber());
+        ps.setInt(11, i + 1); //Чтобы отличить значение "0" по умолчанию(не заполненно), от реально значения - первого элемента в массиве (тоже 0)
+        ps.setString(12, safeToJson(prepareTeaserMapToSave(user.getTeasers())));
 
 
     }

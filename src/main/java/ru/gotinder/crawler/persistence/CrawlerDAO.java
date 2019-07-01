@@ -42,7 +42,7 @@ public class CrawlerDAO {
         dto.setRating(rs.getInt("rating"));
         dto.setDistance(rs.getInt("distance"));
         dto.setBirthday(rs.getDate("birthday").toLocalDate());
-        dto.setRecsDuplicateCount(rs.getInt("recs_duplicate_count"));
+        dto.setRecsDuplicateCount(rs.getInt("avg_batch_rank_idx"));
         String teasersStr = rs.getString("teasers");
         Map<String, String> teasers;
         try {
