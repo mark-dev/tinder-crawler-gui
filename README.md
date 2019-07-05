@@ -6,7 +6,7 @@ I also found similar math problem - [Secretary problem](https://en.wikipedia.org
 
 **But my strategy is write my own tinder client :)**
 
-This project allow to sort your tinder recomendations based on [simple keyword scoring model(/src/main/java/ru/gotinder/crawler/enrich/ScoringModelService.java)
+This project allow to sort your tinder recomendations based on [simple keyword scoring model](/src/main/java/ru/gotinder/crawler/enrich/ScoringModelService.java)
 
 You will no longer see recomendations with empty description!
 
