@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 import ru.gotinder.crawler.persistence.dto.EnrichDataDTO;
@@ -13,12 +15,14 @@ import ru.gotinder.crawler.persistence.util.CrawlerDataPreparedStatementSetter;
 import ru.gotinder.crawler.persistence.util.SQLHelper;
 import ru.gotinder.crawler.persistence.util.UpdateRatingPreparedStatementSetter;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ru.gotinder.crawler.persistence.util.SQLHelper.LOAD_FOR_IMAGE_CACHE;
 import static ru.gotinder.crawler.persistence.util.SQLHelper.SET_VERDICT_SYNC_TIME;
 
 //TODO: Spring Data + Specifications API
@@ -27,9 +31,18 @@ public class CrawlerDAO {
     @Autowired
     private JdbcTemplate template;
 
-    public static final int POSSIBLE_LIKES_DUPLICATE_TRESHOLD = 10;
+
     @Autowired
     private ObjectMapper om;
+
+    private NamedParameterJdbcTemplate namedJdbcTemplate;
+
+    public static final int POSSIBLE_LIKES_DUPLICATE_TRESHOLD = 10;
+
+    @PostConstruct
+    public void init() {
+        namedJdbcTemplate = new NamedParameterJdbcTemplate(template.getDataSource());
+    }
 
     private static final VerdictEnum[] VERDICT_ENUMS = VerdictEnum.values();
     private RowMapper<CrawlerDataDTO> rowMapper = (rs, rowNum) -> {
@@ -135,6 +148,17 @@ public class CrawlerDAO {
         template.update(SET_VERDICT_SYNC_TIME, id);
     }
 
+    public List<CrawlerDataDTO> loadMissInImageCache(int limit) {
+        return template.query(LOAD_FOR_IMAGE_CACHE, rowMapper, limit);
+    }
+
+    public void updateImageCacheDownloadedFlag(List<String> userIds) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("ids", userIds);
+
+
+        namedJdbcTemplate.update("UPDATE crawler_data SET img_cached = true WHERE id in (:ids)", parameters);
+    }
 
     public Optional<CrawlerDataDTO> byId(String id) {
         List<CrawlerDataDTO> res = template.query("SELECT * from crawler_data WHERE id = ?", rowMapper, id);

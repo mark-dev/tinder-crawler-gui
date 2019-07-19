@@ -82,7 +82,8 @@
 
             <div class="row">
                 <div class="col-3">
-                    <img class="image" th:src="${u.getPhoto().get(0)}"/>
+                    <img class="image" th:src="${'/image' +photoUrl.getPath()}"
+                         th:with="photoUrl=${new java.net.URL(u.getPhoto().get(0))}"/>
                 </div>
                 <div class="col-9">
                     <span th:text="${u.getBio()}"></span>
@@ -101,7 +102,8 @@
                     <details class="clickable-element" style="font-weight: 900; font-size: 18px">
                         <summary>Фото</summary>
                         <div th:each="photo : ${u.getPhoto()}">
-                            <img style="max-height: 600px; max-width: 400px;" th:src="${photo}">
+                            <img style="max-height: 600px; max-width: 400px;" th:src="${'/image' +photoUrl.getPath()}"
+                                 th:with="photoUrl=${new java.net.URL(photo)}">
                         </div>
                     </details>
 
