@@ -1,9 +1,13 @@
 package ru.gotinder.crawler.service;
 
-//Проблема в том, что изображение перестает быть доступным по ссылке, если пользователь его удалил
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.StopWatch;
+import ru.gotinder.crawler.persistence.CrawlerDAO;
+import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 
 import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
@@ -12,21 +16,29 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Service
+
+//Кеширует изображения в локальной директории
+//Проблема в том, что изображение перестает быть доступным по ссылке, если пользователь его удалил
+//Но и объем места, необходимый для такого кеша оч велик. Как вариант - кешировать только пользователей с хорошим рейтингом
 @Slf4j
-public class ImageCacheService {
+public class ImageCacheService extends SimpleImageService {
 
-    private final String TINDER_IMG_URL = "https://images-ssl.gotinder.com";
-    private final String CACHE_DIR = "/media/mark/DATAPART1/img-cache";
+    @Autowired
+    private CrawlerDAO dao;
+
+    @Value("${tinder.img-cache.dir}")
+    private String cacheDir;
 
 
     private File cacheDirFile;
 
     @PostConstruct
     public void init() {
-        cacheDirFile = new File(CACHE_DIR);
+        cacheDirFile = new File(cacheDir);
         if (!cacheDirFile.exists()) {
             boolean ret = cacheDirFile.mkdir();
             if (!ret)
@@ -35,6 +47,7 @@ public class ImageCacheService {
     }
 
     //Сюда передается кусок из URL, первое это userId, второе - photoId /5d0c9fa2613788150008ca8c/original_332477c6-e2aa-4f90-850b-fe1c289d47bb.jpeg
+    @Override
     public Optional<InputStream> getImage(String userId, String imageId) {
 
         File f = getRelatedFileInCache(userId, imageId);
@@ -62,20 +75,40 @@ public class ImageCacheService {
 
     }
 
+    @Scheduled(fixedRate = 1000 * 60 * 15) //Раз в 15 мин
+    public void downloadImages() {
+        log.info("downloadImages called");
+        StopWatch sw = new StopWatch();
+        sw.start();
 
-    private String buildRequestURL(String userId, String photoId) {
-        return TINDER_IMG_URL + "/" + userId + "/" + photoId;
+        //Выгружаем те записи, для которых мы не скачали изображения
+        List<CrawlerDataDTO> needImgCacheInit = dao.loadMissInImageCache(100);
+        for (CrawlerDataDTO d : needImgCacheInit) {
+            List<String> photo = d.getPhoto();
+            for (String p : photo) {
+                try {
+                    URL u = new URL(p);
+                    String[] userAndPhotoId = u.getPath().substring(1).split("/");
+                    getImage(userAndPhotoId[0], userAndPhotoId[1]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        //Обновляем флаг, считаем что изображения мы скачали
+        List<String> ids = needImgCacheInit.stream()
+                .map(CrawlerDataDTO::getId)
+                .collect(Collectors.toList());
+
+        if (!ids.isEmpty())
+            dao.updateImageCacheDownloadedFlag(ids);
+
+        sw.stop();
+
+        log.info("downloadImages finished, takes {} ms", sw.getLastTaskTimeMillis());
     }
 
-    private File getRelatedFileInCache(String userId, String photoId) {
-        return Paths.get(CACHE_DIR, userId, photoId).toFile();
-    }
-
-    private File getRelatedFileInCache(String userId) {
-        return Paths.get(CACHE_DIR, userId).toFile();
-    }
-
-    private Optional<BufferedImage> loadFromTinderBackend(String userId, String photoId) {
+    protected Optional<BufferedImage> loadFromTinderBackend(String userId, String photoId) {
         String tinderRequestUrl = buildRequestURL(userId, photoId);
         try {
             URL u = new URL(tinderRequestUrl);
@@ -87,14 +120,12 @@ public class ImageCacheService {
         }
     }
 
-    private byte[] readInputStreamAsBytes(InputStream is) {
-        try {
-            byte[] buffer = new byte[is.available()];
-            is.read(buffer);
-            return buffer;
-        } catch (IOException ex) {
-            return new byte[]{};
-        }
+    private File getRelatedFileInCache(String userId, String photoId) {
+        return Paths.get(cacheDir, userId, photoId).toFile();
+    }
+
+    private File getRelatedFileInCache(String userId) {
+        return Paths.get(cacheDir, userId).toFile();
     }
 
     private byte[] saveImageToFile(BufferedImage is, File file, String userId) {
