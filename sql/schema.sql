@@ -48,6 +48,9 @@ create index if not exists crawler_data_enrich_required_index
 create index if not exists crawler_data_height_index
     on crawler_data (height);
 
+create index if not exists crawler_data_updated_at_index
+    on crawler_data (updated_at);
+
 CREATE EXTENSION pg_trgm;
 
 CREATE index trgm_idx_crawler_data_bio
