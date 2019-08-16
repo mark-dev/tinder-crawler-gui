@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:if="${users.isEmpty() || users.size() > 1}">Tinder crawler</title>
+    <title th:if="${users.size() == 1}" th:text="'Tinder Crawler -- '+${users.get(0).getName()}"></title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
+    <link href="/assets/css/main.css" rel="stylesheet"/>
+    <link href="/assets/css/app.css" rel="stylesheet"/>
+
+    <!-- Scripts -->
+    <script src="/assets/js/jquery.min.js"></script>
+</head>
+
+<body class="is-preload">
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+    <!-- Main -->
+    <div id="main">
+        <div class="inner">
+
+            <!-- Header -->
+            <header id="header">
+                <a class="logo" href="/"><strong>Результаты поиска</strong></a>
+            </header>
+
+            <!-- Content -->
+            <section>
+                <!--TODO: Поиск сделать-->
+                <!--                <input type="text" name="query" id="search-field" placeholder="Search"/>-->
+                <!--                <a href="#" class="button primary icon fa-search" onclick="redirectToSearchResults()">Icon</a>-->
+                <div class="container" th:insert="~{fragments/userlist::auserlist}"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" th:insert="~{fragments/navbar-menu::menu}"></div>
+
+</div>
+
+
+<script src="/assets/js/browser.min.js"></script>
+<script src="/assets/js/breakpoints.min.js"></script>
+<script src="/assets/js/util.js"></script>
+<script src="/assets/js/main.js"></script>
+</body>
+</html>

@@ -92,12 +92,20 @@ public class CrawlerDAO {
         return template.query(SQLHelper.LOAD_ENRICH_REQUIRED, rowMapper, 500);
     }
 
-    public List<CrawlerDataDTO> topByRating(String search, int page, int size) {
-        return template.query(SQLHelper.TOP_BY_RATING, rowMapper, search, search, size, page * size);
+    public List<CrawlerDataDTO> topByRating(int page, int size) {
+        return template.query(SQLHelper.TOP_BY_RATING, rowMapper, size, page * size);
     }
 
-    public Integer countTopByRating(String search) {
-        return template.queryForObject(SQLHelper.COUNT_TOP_BY_RATING, Integer.class, search, search);
+    public List<CrawlerDataDTO> search(String search, int page, int size) {
+        return template.query(SQLHelper.SEARCH, rowMapper, search, size, page * size);
+    }
+
+    public Integer countSearch(String search) {
+        return template.queryForObject(SQLHelper.COUNT_SEARCH, Integer.class, search);
+    }
+
+    public Integer countTopByRating() {
+        return template.queryForObject(SQLHelper.COUNT_TOP_BY_RATING, Integer.class);
     }
 
     public List<CrawlerDataDTO> loadRandom(int size) {

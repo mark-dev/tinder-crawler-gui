@@ -22,8 +22,11 @@ public interface SQLHelper {
     String COUNT_ENRICH_REQUIRED = "select count(*) from crawler_data where enrich_required;";
     String LOAD_ENRICH_REQUIRED = "SELECT * FROM crawler_data WHERE enrich_required LIMIT ?";
 
-    String TOP_BY_RATING = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND (length(?) = 0 OR lower(bio) like '%'|| lower(?) || '%') AND verdict_sync_at is null ORDER BY rating desc, updated_at DESC, id ASC LIMIT ? OFFSET ?";
-    String COUNT_TOP_BY_RATING = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND (length(?) = 0 OR bio like '%'|| lower(?) || '%') AND verdict_sync_at is null";
+    String TOP_BY_RATING = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null ORDER BY rating desc, updated_at DESC, id ASC LIMIT ? OFFSET ?";
+    String COUNT_TOP_BY_RATING = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null";
+
+    String SEARCH = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null AND (lower(bio) like '%'|| lower(?) || '%') order by updated_at DESC, id ASC LIMIT ? OFFSET ?";
+    String COUNT_SEARCH = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null AND (lower(bio) like '%'|| lower(?) || '%')";
 
     String COUNT_LATEST = "SELECT count(*) from crawler_data WHERE rating > 0 AND hidden = FALSE AND verdict = 0 AND verdict_sync_at is null";
     String LOAD_LATEST = "select * from crawler_data WHERE rating > 0 AND hidden = FALSE AND verdict = 0 AND verdict_sync_at is null " +

@@ -4,13 +4,13 @@
 <div th:if="${page != null && count != null && size != null && count > size}"
      th:fragment="pagingcontrol" style="text-align: center">
         <span>
-             <a th:href="@{${#httpServletRequest.requestURI}(page=${page-1 >= 0 ? page-1 : 0})}"
+             <a th:href="@{${#httpServletRequest.requestURI}(page=${page-1 >= 0 ? page-1 : 0},q=${search},size=${size})}"
                 class="icon fa-arrow-left"
                 style="font-size: 48px">
 
              </a>
             <b style="font-size: 16px" th:text="${page} + '/' + ${count/size}"></b>
-            <a th:href="@{${#httpServletRequest.requestURI}(page=${page+1 <= count/size ? page+1 : count/size})}"
+            <a th:href="@{${#httpServletRequest.requestURI}(page=${page+1 <= count/size ? page+1 : count/size},q=${search},size=${size})}"
                class="icon fa-arrow-right"
                style="font-size: 48px">
 

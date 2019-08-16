@@ -1,6 +1,5 @@
 package ru.gotinder.crawler.rest;
 
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +32,7 @@ public class PageController {
     TinderCrawlerService tcs;
 
 
-    @GetMapping({"latest"})
+    @GetMapping({"/"})
     public String latest(Model model,
                          @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
                          @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
@@ -88,24 +87,37 @@ public class PageController {
         return "likes";
     }
 
-    @GetMapping({"/"})
-    @SneakyThrows
-    public String index(Model model,
-                        @RequestParam(value = "q", required = false, defaultValue = "") String search,
-                        @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                        @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+    @GetMapping("search")
+    public String search(Model model,
+                         @RequestParam(value = "q") String q,
+                         @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                         @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+        List<CrawlerDataDTO> users = dao.search(q, page, size);
 
-        List<CrawlerDataDTO> users = dao.topByRating(search, page, size);
-        //TODO: search сюда передаем еще.
-        //TODO: Пора юзать Spring Data и Specifications..
-
-        Integer count = dao.countTopByRating(search);
+        Integer count = dao.countSearch(q);
 
         model.addAttribute("users", users);
         model.addAttribute("count", count);
         model.addAttribute("size", size);
         model.addAttribute("page", page);
-        return "index";
+        model.addAttribute("search", q);
+        return "search";
+    }
+
+    @GetMapping({"top"})
+    public String index(Model model,
+                        @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+
+        List<CrawlerDataDTO> users = dao.topByRating(page, size);
+
+        Integer count = dao.countTopByRating();
+
+        model.addAttribute("users", users);
+        model.addAttribute("count", count);
+        model.addAttribute("size", size);
+        model.addAttribute("page", page);
+        return "top";
     }
 
     @GetMapping("/user/{id}")
@@ -114,7 +126,7 @@ public class PageController {
         List<CrawlerDataDTO> payload = u.map((d) -> Arrays.asList(d)).orElse(Collections.emptyList());
         model.addAttribute("users", payload);
         model.addAttribute("sync", true);
-        return "index";
+        return "top";
     }
 
 }

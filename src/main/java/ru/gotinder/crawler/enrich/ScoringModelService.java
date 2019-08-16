@@ -79,6 +79,7 @@ public class ScoringModelService {
         put("умная", -1000);
         put("красивая", -1000);
         put("420", -1000);
+        put("4:20", -1000);
 
     }};
 
