@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
+
 <div th:if="${!users.isEmpty()}" th:fragment="auserlist">
     <script>
         function hideUser(user) {
@@ -42,7 +43,6 @@
                 }
             });
         }
-
     </script>
     <div th:replace="~{fragments/paging::pagingcontrol}"></div>
     <!--@thymesVar id="adminViewDTO" type="test.view.AdminViewDTO"-->
@@ -102,7 +102,9 @@
                     <details class="clickable-element" style="font-weight: 900; font-size: 18px">
                         <summary>Фото</summary>
                         <div th:each="photo : ${u.getPhoto()}">
-                            <img style="max-height: 600px; max-width: 400px;" th:src="${'/image' +photoUrl.getPath()}"
+                            <img class="lazy"
+                                 style="max-height: 600px; max-width: 400px;"
+                                 th:data-src="${'/image' +photoUrl.getPath()}"
                                  th:with="photoUrl=${new java.net.URL(photo)}">
                         </div>
                     </details>
@@ -193,6 +195,10 @@
 <div th:unless="${!users.isEmpty()}" th:fragment="auserlist">
     Нет данных
 </div>
-
+<script>
+    if (lazyLoadInstance) {
+        lazyLoadInstance.update();
+    }
+</script>
 </body>
 </html>

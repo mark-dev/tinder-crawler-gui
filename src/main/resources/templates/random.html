@@ -9,6 +9,12 @@
 
     <!-- Scripts -->
     <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/lazyload.min.js"></script>
+    <script>
+        var lazyLoadInstance = new LazyLoad({
+            elements_selector: ".lazy"
+        });
+    </script>
 </head>
 <body class="is-preload">
 
@@ -40,5 +46,8 @@
 <script src="/assets/js/breakpoints.min.js"></script>
 <script src="/assets/js/util.js"></script>
 <script src="/assets/js/main.js"></script>
+<script>
+    lazyLoadInstance.update();
+</script>
 </body>
 </html>
