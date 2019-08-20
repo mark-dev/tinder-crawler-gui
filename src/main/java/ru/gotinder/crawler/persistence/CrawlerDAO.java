@@ -37,7 +37,7 @@ public class CrawlerDAO {
 
     private NamedParameterJdbcTemplate namedJdbcTemplate;
 
-    public static final int POSSIBLE_LIKES_DUPLICATE_TRESHOLD = 10;
+    public static final int POSSIBLE_LIKES_DUPLICATE_TRESHOLD = 20;
 
     @PostConstruct
     public void init() {
@@ -120,8 +120,8 @@ public class CrawlerDAO {
         return template.queryForObject(SQLHelper.COUNT_LATEST, Integer.class);
     }
 
-    public List<CrawlerDataDTO> loadVerdictedButNotSynced(int page, int size) {
-        return template.query(SQLHelper.LOAD_VERDICTED_BUT_NOT_SYNCED, rowMapper, size, page * size);
+    public List<CrawlerDataDTO> loadVerdictedButNotSynced(VerdictEnum verdictBoundInclusive, int page, int size) {
+        return template.query(SQLHelper.LOAD_VERDICTED_BUT_NOT_SYNCED, rowMapper, verdictBoundInclusive.ordinal(), size, page * size);
     }
 
     public Integer countVerdicted() {

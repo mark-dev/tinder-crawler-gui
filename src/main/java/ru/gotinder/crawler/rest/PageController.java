@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
+import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 import ru.gotinder.crawler.service.FacebookGateway;
 import ru.gotinder.crawler.service.TinderCrawlerService;
 
@@ -63,7 +64,7 @@ public class PageController {
     public String verdicted(Model model,
                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
                             @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
-        List<CrawlerDataDTO> users = dao.loadVerdictedButNotSynced(page, size);
+        List<CrawlerDataDTO> users = dao.loadVerdictedButNotSynced(VerdictEnum.SUPERLIKE, page, size);
         Integer count = dao.countVerdicted();
         model.addAttribute("users", users);
         model.addAttribute("count", count);

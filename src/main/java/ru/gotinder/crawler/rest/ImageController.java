@@ -31,6 +31,7 @@ public class ImageController {
     public void getImageAsByteArray(HttpServletResponse response,
                                     @PathVariable("userId") String userId,
                                     @PathVariable("imageId") String imageId) throws IOException {
+        //TODO: Если кеш выключен то возможно лучше редирект просто отправить? На url с картинкой
         Optional<InputStream> image = service.getImage(userId, imageId);
         if (image.isPresent()) {
             response.setContentType(MediaType.IMAGE_JPEG_VALUE);

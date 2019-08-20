@@ -50,7 +50,7 @@ public class ControlPanel {
     public SyncAllVerdictsDTO syncVerdicts() {
         //TODO: Предупреждать если больше накопилось чем limit. Это сделанно чтобы не заспамить запросами
         int limit = 50;
-        List<SyncVerdictResponse> responses = tcs.syncVerdictBatch(limit);
+        List<SyncVerdictResponse> responses = tcs.syncVerdictedItems(VerdictEnum.LIKE, limit);
 
         return calculateSyncVerdictStats(responses);
     }

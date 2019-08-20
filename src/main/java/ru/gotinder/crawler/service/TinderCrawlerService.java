@@ -19,16 +19,14 @@ import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 import ru.gotinder.crawler.persistence.dto.EnrichDataDTO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 public class TinderCrawlerService {
 
+    private static final Random RANDOM = new Random();
     @Autowired
     FacebookGateway fb;
 
@@ -57,33 +55,41 @@ public class TinderCrawlerService {
     }
 
     @SneakyThrows
-    public List<SyncVerdictResponse> syncVerdictBatch(int size) {
-        Tinder api = getAPI();
-        List<CrawlerDataDTO> dtos = dao.loadVerdictedButNotSynced(0, size);
-        List<SyncVerdictResponse> responses = new ArrayList<>(dtos.size());
-        boolean hasFailedSuperLikes = false;
-        for (CrawlerDataDTO d : dtos) {
-            SyncVerdictResponse vsr;
-            if (d.getVerdict() == VerdictEnum.SUPERLIKE && hasFailedSuperLikes) {
-                log.info("Skipped superlike for {} due already has failed superlike in this batch", d.getId());
-                SuperLike superLike = new SuperLike();
-                superLike.setMatch(false);
-                superLike.setLimitExceeded(true);
-                superLike.setStatus(200);
-                vsr = new SyncVerdictResponse(false, superLike);
-            } else {
-                vsr = syncVerdict(d, api);
-                if (!vsr.isSuccess() && d.getVerdict() == VerdictEnum.SUPERLIKE) {
-                    hasFailedSuperLikes = true;
+    public List<SyncVerdictResponse> syncVerdictsBatch(List<CrawlerDataDTO> dtos) {
+        List<SyncVerdictResponse> responses = Collections.emptyList();
+
+        if (!dtos.isEmpty()) {
+            responses = new ArrayList<>(dtos.size());
+            Tinder api = getAPI();
+            boolean hasFailedSuperLikes = false;
+            for (CrawlerDataDTO d : dtos) {
+                SyncVerdictResponse vsr;
+                if (d.getVerdict() == VerdictEnum.SUPERLIKE && hasFailedSuperLikes) {
+                    log.info("Skipped superlike for {} due already has failed superlike in this batch", d.getId());
+                    SuperLike superLike = new SuperLike();
+                    superLike.setMatch(false);
+                    superLike.setLimitExceeded(true);
+                    superLike.setStatus(200);
+                    vsr = new SyncVerdictResponse(false, superLike);
+                } else {
+                    vsr = syncVerdict(d, api);
+                    if (!vsr.isSuccess() && d.getVerdict() == VerdictEnum.SUPERLIKE) {
+                        hasFailedSuperLikes = true;
+                    }
+                    log.info("Sync verdict user: {}, verdict:{}, response: {}", d.getId(), d.getVerdict(), vsr);
                 }
-                log.info("Sync verdict user: {}, verdict:{}, response: {}", d.getId(), d.getVerdict(), vsr);
+                responses.add(vsr);
+                TimeUnit.MILLISECONDS.sleep(1000 + RANDOM.nextInt(2000));
             }
-
-
-            responses.add(vsr);
-            TimeUnit.MILLISECONDS.sleep(1000);
         }
+
         return responses;
+    }
+
+    @SneakyThrows
+    public List<SyncVerdictResponse> syncVerdictedItems(VerdictEnum verdictBoundInclusive, int limit) {
+        List<CrawlerDataDTO> dtos = dao.loadVerdictedButNotSynced(verdictBoundInclusive, 0, limit);
+        return syncVerdictsBatch(dtos);
     }
 
 
