@@ -10,11 +10,11 @@ import java.util.Optional;
 
 @Slf4j
 public class SimpleImageService implements IImageService {
-    private final String TINDER_IMG_URL = "https://images-ssl.gotinder.com";
+
 
     @Override
     public Optional<InputStream> getImage(String userId, String imageId) {
-        String tinderRequestUrl = buildRequestURL(userId, imageId);
+        String tinderRequestUrl = getTinderImgURL(userId, imageId);
         try {
             URL u = new URL(tinderRequestUrl);
             return Optional.of(u.openStream());
@@ -23,8 +23,8 @@ public class SimpleImageService implements IImageService {
         }
     }
 
-
-    protected String buildRequestURL(String userId, String photoId) {
-        return TINDER_IMG_URL + "/" + userId + "/" + photoId;
+    @Override
+    public boolean canUseRedirect() {
+        return true;
     }
 }

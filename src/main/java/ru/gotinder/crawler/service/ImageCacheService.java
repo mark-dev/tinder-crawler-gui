@@ -109,7 +109,7 @@ public class ImageCacheService extends SimpleImageService {
     }
 
     protected Optional<BufferedImage> loadFromTinderBackend(String userId, String photoId) {
-        String tinderRequestUrl = buildRequestURL(userId, photoId);
+        String tinderRequestUrl = getTinderImgURL(userId, photoId);
         try {
             URL u = new URL(tinderRequestUrl);
             return Optional.ofNullable(ImageIO.read(u));

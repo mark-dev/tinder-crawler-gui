@@ -31,11 +31,18 @@ public class ImageController {
     public void getImageAsByteArray(HttpServletResponse response,
                                     @PathVariable("userId") String userId,
                                     @PathVariable("imageId") String imageId) throws IOException {
-        //TODO: Если кеш выключен то возможно лучше редирект просто отправить? На url с картинкой
-        Optional<InputStream> image = service.getImage(userId, imageId);
-        if (image.isPresent()) {
-            response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-            IOUtils.copy(image.get(), response.getOutputStream());
+
+        //TODO: В случае если кеш отсутствует
+        // - можно сразу в верстке подменять URL, чтоб не делать лишних запросов
+
+        if (service.canUseRedirect()) {
+            response.sendRedirect(service.getTinderImgURL(userId, imageId));
+        } else {
+            Optional<InputStream> image = service.getImage(userId, imageId);
+            if (image.isPresent()) {
+                response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+                IOUtils.copy(image.get(), response.getOutputStream());
+            }
         }
     }
 }
