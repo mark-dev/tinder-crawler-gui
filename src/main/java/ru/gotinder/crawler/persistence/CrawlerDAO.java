@@ -148,8 +148,8 @@ public class CrawlerDAO {
         return template.queryForObject(SQLHelper.COUNT_ENRICH_REQUIRED, Integer.class);
     }
 
-    public void setVerdict(String id, VerdictEnum v) {
-        template.update(SQLHelper.SET_VERDICT, v.ordinal(), id);
+    public void setVerdict(String id, VerdictEnum v, boolean autoLiked) {
+        template.update(SQLHelper.SET_VERDICT, v.ordinal(), autoLiked, id);
     }
 
     public void updateVerdictTimestamp(String id) {

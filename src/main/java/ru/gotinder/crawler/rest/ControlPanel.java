@@ -60,7 +60,7 @@ public class ControlPanel {
     public boolean verdict(@RequestBody SetVerdictDTO dto) {
         String id = dto.getId();
         VerdictEnum verdict = dto.getVerdict();
-        dao.setVerdict(id, verdict);
+        dao.setVerdict(id, verdict, false);
         return true;
     }
 

@@ -20,7 +20,7 @@ You will no longer see recomendations with empty description!
 
 ### How it works: 
 
-1. Pull tinder recomendations (+ store in [postgresql database](/sql/schema.sql))
+1. Pull tinder recomendations (+ store in [postgresql database](/sql/scripts/schema.sql))
 
 2. Apply scoring model
 

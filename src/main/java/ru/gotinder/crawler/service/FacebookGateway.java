@@ -28,6 +28,9 @@ public class FacebookGateway {
     @Value("${tinder.crawler.chrome-profile-dir}")
     private String chromeProfileDir;
 
+    @Value("${tinder.crawler.chrome-binary}")
+    private String chromeBinary;
+
     private String token;
     private Instant lastTokenTs = null;
     private ChromeOptions chromeOptions;
@@ -37,6 +40,7 @@ public class FacebookGateway {
         chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("user-data-dir=" + chromeProfileDir);
         chromeOptions.addArguments("--start-maximized");
+        chromeOptions.setBinary(chromeBinary);
     }
 
     public synchronized boolean hasToken() {

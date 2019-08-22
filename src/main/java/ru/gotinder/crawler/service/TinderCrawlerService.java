@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class TinderCrawlerService {
 
     private static final Random RANDOM = new Random();
+
     @Autowired
     FacebookGateway fb;
 
@@ -48,10 +49,8 @@ public class TinderCrawlerService {
     private Integer crawlerLoops;
 
     @SneakyThrows
-    //TODO: caching?
     public Tinder getAPI() {
-        Tinder api = Tinder.fromAccessToken(fb.getToken());
-        return api;
+        return Tinder.fromAccessToken(fb.getToken());
     }
 
     @SneakyThrows
@@ -86,7 +85,14 @@ public class TinderCrawlerService {
         return responses;
     }
 
-    @SneakyThrows
+    /**
+     * @param verdictBoundInclusive -
+     *                              "правая" граница вердиктов, для реализации ограничения по типам вердиктов
+     *                              Т.е. например, если указываем LIKE, то будут синхронизироваться только PASS и LIKE
+     *                              Если указываем SUPERLIKE - будет синхронизироваться все (PASS,LIKE,SUPERLIKE)
+     * @param limit                 Ограничение по количеству (чтоб не забанили)
+     * @return
+     */
     public List<SyncVerdictResponse> syncVerdictedItems(VerdictEnum verdictBoundInclusive, int limit) {
         List<CrawlerDataDTO> dtos = dao.loadVerdictedButNotSynced(verdictBoundInclusive, 0, limit);
         return syncVerdictsBatch(dtos);
@@ -158,12 +164,12 @@ public class TinderCrawlerService {
     public Integer enrichData(Integer printRatingTreshold) {
 
         Integer enrichRequiredCountBefore = dao.countEnrichRequired();
-        int limit = 500;
+        int limitPerQuery = 500; //TODO: В конфиг? Если на RaspberryPi запускать может тяжко выйти
         int step = 0;
         int processed = 0;
 
         List<CrawlerDataDTO> users = null;
-        while (!(users = dao.loadEnrichRequired(limit)).isEmpty()) {
+        while (!(users = dao.loadEnrichRequired(limitPerQuery)).isEmpty()) {
             Map<String, EnrichDataDTO> ratingMap = new HashMap<>(users.size());
             for (CrawlerDataDTO u : users) {
 

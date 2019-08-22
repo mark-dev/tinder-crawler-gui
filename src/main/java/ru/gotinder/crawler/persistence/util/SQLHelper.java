@@ -14,7 +14,7 @@ public interface SQLHelper {
 
     String DROP_ENRICH_FLAG = "UPDATE crawler_data SET enrich_required = true";
 
-    String SET_VERDICT = "UPDATE crawler_data SET verdict = ? WHERE id = ?";
+    String SET_VERDICT = "UPDATE crawler_data SET verdict = ?, verdicted_at = now(), autoliked = ?  WHERE id = ?";
     String SET_VERDICT_SYNC_TIME = "UPDATE crawler_data SET verdict_sync_at = now() WHERE id = ?";
 
     String LOAD_FOR_IMAGE_CACHE = "SELECT * FROM crawler_data WHERE img_cached = false LIMIT ?";
@@ -33,7 +33,7 @@ public interface SQLHelper {
             "order by date_trunc('day', GREATEST(ts,updated_at)) DESC, rating DESC, length(bio) DESC, id ASC " +
             "LIMIT ? OFFSET ?";
 
-    String LOAD_VERDICTED_BUT_NOT_SYNCED = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict > 0 AND verdict <= ? AND verdict_sync_at is null ORDER BY verdict DESC, id ASC LIMIT ? OFFSET ?";
+    String LOAD_VERDICTED_BUT_NOT_SYNCED = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict > 0 AND verdict <= ? AND verdict_sync_at is null ORDER BY verdict DESC, verdicted_at DESC, id ASC LIMIT ? OFFSET ?";
     String COUNT_VERDICTED_BUT_NOT_SYNCED = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict <> 0 AND verdict_sync_at is null";
 
     String LOAD_RANDOM = "select * from crawler_data where hidden = FALSE and now() - updated_at <= interval '7 days' and height > 0 and height < 170 and verdict = 0 order by random() limit ?";

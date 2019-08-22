@@ -59,7 +59,7 @@ public class ScheduledTinderService {
 
 
         for (CrawlerDataDTO d : likes) {
-            dao.setVerdict(d.getId(), VerdictEnum.LIKE);
+            dao.setVerdict(d.getId(), VerdictEnum.LIKE, true);
         }
 
         log.info("Autolike finish, liked {} ppl", likes.size());
