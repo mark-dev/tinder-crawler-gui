@@ -1,0 +1,7 @@
+#set your credentials and change filename to: application-facebook.yaml
+tinder:
+  crawler:
+    fb:
+      login: your-facebook-login
+      password: your-facebook-password
+      driver-path: path/to/phantomjs

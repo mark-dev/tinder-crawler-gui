@@ -9,7 +9,7 @@ PSQL=psql
 
 run() {
   $*
-  if [ $? -ne 0 ]
+  if [[ $? -ne 0 ]]
   then
     echo "$* failed with exit code $?"
     exit 1
@@ -18,7 +18,7 @@ run() {
   fi
 }
 
-if [ -z "$1" ]
+if [[ -z "$1" ]]
 then
     echo "Create database on localhost"
     export PG_HOST=localhost
@@ -29,8 +29,12 @@ fi
 echo "Create database"
 ${PSQL} -f scripts/create-db.sql -h $PG_HOST -p $PG_PORT -U $PG_USER -W
 
-echo "Create schema"
-${PSQL}  -f scripts/trawler_backup.sql -h $PG_HOST -p $PG_PORT -U $PG_USER -d $DB_NAME
+SCHEMA=scripts/tcrawler_backup.sql
+if [[ -f ${SCHEMA} ]]
+then
+    echo "Create schema"
+    ${PSQL}  -f scripts/tcrawler_backup.sql -h $PG_HOST -p $PG_PORT -U $PG_USER -d $DB_NAME
+fi
 
 ${PSQL}  -h $PG_HOST -p $PG_PORT -U $PG_USER -d $DB_NAME -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tcrawler;"
 ${PSQL}  -h $PG_HOST -p $PG_PORT -U $PG_USER -d $DB_NAME -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO tcrawler;"

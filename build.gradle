@@ -40,18 +40,26 @@ repositories {
 
 dependencies {
 
+    //Spring
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: bootVersion
     implementation(group: "org.springframework.boot", name: "spring-boot-starter-web", version: bootVersion)
     implementation(group: 'org.springframework', name: 'spring-jdbc')
-
-
-    implementation fileTree(dir: 'libs', include: '*.jar')
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
-    implementation group: 'com.zaxxer', name: 'HikariCP'
-    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: bootVersion
+    
+    //JS
     implementation group: 'org.webjars', name: 'bootstrap', version: '4.2.1'
     implementation group: 'org.webjars', name: 'jquery', version: '3.3.1-2'
+    
+    //Database Utils
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    implementation group: 'com.zaxxer', name: 'HikariCP'
+
+    //Facebook auth
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
+    implementation group: 'com.codeborne', name: 'phantomjsdriver', version: '1.4.4'
+    
+    //Misc
+    implementation fileTree(dir: 'libs', include: '*.jar') //non maven deps
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
 
     //Lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion

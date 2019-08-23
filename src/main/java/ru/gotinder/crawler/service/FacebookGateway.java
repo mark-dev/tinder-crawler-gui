@@ -1,13 +1,12 @@
 package ru.gotinder.crawler.service;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,72 +21,99 @@ import java.util.regex.Pattern;
 public class FacebookGateway {
     private static Pattern EXTRACT_TOKEN_PATTERN = Pattern.compile("access_token=([\\w\\d]+)");
 
-    @Value("${tinder.crawler.facebook-token-url}")
-    private String tokenUrl;
+    @Value("${tinder.crawler.fb.login-url}")
+    private String facebookLoginUrl;
 
-    @Value("${tinder.crawler.chrome-profile-dir}")
-    private String chromeProfileDir;
+    @Value("${tinder.crawler.fb.login}")
+    private String fbLogin;
 
-    @Value("${tinder.crawler.chrome-binary}")
-    private String chromeBinary;
+    @Value("${tinder.crawler.fb.password}")
+    private String fbPass;
+
+    @Value("${tinder.crawler.fb.token-url}")
+    private String facebookTinderSignInUrl;
+
+    @Value("${tinder.crawler.fb.driver-path}")
+    private String driverPath;
+
 
     private String token;
     private Instant lastTokenTs = null;
-    private ChromeOptions chromeOptions;
+
+    private WebDriver driver;
+    private DesiredCapabilities settings;
 
     @PostConstruct
     public void init() {
-        chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("user-data-dir=" + chromeProfileDir);
-        chromeOptions.addArguments("--start-maximized");
-        chromeOptions.setBinary(chromeBinary);
-    }
 
-    public synchronized boolean hasToken() {
-        return lastTokenTs != null && Duration.between(lastTokenTs, Instant.now()).compareTo(Duration.ofHours(1)) < 0;
+        settings = new DesiredCapabilities();
+        settings.setJavascriptEnabled(true);
+        settings.setCapability("takesScreenshot", true);
+        settings.setCapability("userAgent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+        settings.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, driverPath);
+
+        //На старте авторизируемся в фейсбуке
+        //TODO: Делать это по таймеру, может протухнуть сессия
+        driver = loginToFacebook();
     }
 
     public synchronized String getToken() {
-        if (!hasToken()) {
+        if (!hasValidToken()) {
             refreshToken();
         }
         return token;
     }
 
-    public synchronized void refreshToken() {
-        token = obtainFaceBookTokenViaChromeDriver();
-        lastTokenTs = Instant.now();
+    private WebDriver loginToFacebook() {
+        try {
+            WebDriver driver = new PhantomJSDriver(settings);
+            driver.get(facebookLoginUrl);
+
+            WebElement login = driver.findElement(By.id("email"));
+            WebElement password = driver.findElement(By.id("pass"));
+            login.sendKeys(fbLogin);
+            password.sendKeys(fbPass);
+
+            driver.findElement(By.id("loginbutton")).submit();
+            return driver;
+        } catch (Exception ex) {
+            log.info("Exception while login to facebook", ex);
+            System.exit(1);
+        }
+        throw new RuntimeException("Not reachable");
     }
 
-    @SneakyThrows
-    private String obtainFaceBookTokenViaChromeDriver() {
-        WebDriver driver = new ChromeDriver(chromeOptions);
-        driver.get(tokenUrl);
+    //TODO: Нужно убедится что авторизационная сессия с фейсбуком не истекла
+    private String tinderSignInViaFacebookAndGetToken() {
         try {
+            driver.get(facebookTinderSignInUrl);
             WebElement element = driver.findElement(By.xpath("//*[@id=\"platformDialogForm\"]/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/button[2]"));
             element.submit();
-        } catch (NoSuchElementException ex) {
-            log.info("Facebook submit form not found \n" +
-                    "Probably this is your first application run, you need manually login to facebook using special selenium profile of google chrome \n" +
-                    "Sign in and restart app");
-            //TODO: implement login via hard-coded login&password
-            System.exit(0);
+
+            String htmlSource = driver.getPageSource();
+            Matcher matcher = EXTRACT_TOKEN_PATTERN.matcher(htmlSource);
+            boolean hasToken = matcher.find();
+
+            driver.quit();
+
+            if (hasToken) {
+                return matcher.group(1);
+            } else
+                throw new RuntimeException("No token found after submit tinder-app sign-in form");
+        } catch (Exception ex) {
+            log.error("Exeption while facebook auth", ex);
+            System.exit(1);
         }
 
-
-        String htmlSource = driver.getPageSource();
-
-        log.debug(htmlSource);
-        Matcher matcher = EXTRACT_TOKEN_PATTERN.matcher(htmlSource);
-        boolean hasToken = matcher.find();
-
-        driver.quit();
-
-        if (hasToken) {
-            return matcher.group(1);
-        } else
-            return null;
+        throw new RuntimeException("cannot reach here");
     }
 
+    private boolean hasValidToken() {
+        return lastTokenTs != null && Duration.between(lastTokenTs, Instant.now()).compareTo(Duration.ofHours(1)) < 0;
+    }
 
+    private void refreshToken() {
+        token = tinderSignInViaFacebookAndGetToken();
+        lastTokenTs = Instant.now();
+    }
 }
