@@ -27,6 +27,7 @@ spring:
   thymeleaf:
     cache: false
   datasource:
+    #TODO: use tcrawler user
     url: jdbc:postgresql://localhost/tcrawler?user=postgres&password=postgres
     hikari:
       maximum-pool-size: 4

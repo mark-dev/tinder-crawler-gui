@@ -35,7 +35,7 @@ public class CrawlerDataDTO {
     //System stuff
     private String contentHash;
     private String sNumber;
-    private Integer recsDuplicateCount;
-
+    private Integer recsCount;
+    private Integer avgBatchRank;
 
 }

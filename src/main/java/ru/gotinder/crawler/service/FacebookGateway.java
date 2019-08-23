@@ -94,8 +94,6 @@ public class FacebookGateway {
             Matcher matcher = EXTRACT_TOKEN_PATTERN.matcher(htmlSource);
             boolean hasToken = matcher.find();
 
-            driver.quit();
-
             if (hasToken) {
                 return matcher.group(1);
             } else

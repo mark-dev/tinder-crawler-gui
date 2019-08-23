@@ -131,8 +131,12 @@
                         <span th:text="${u.getDistance()}"></span>
                     </span>
                         <span>
-                         <img alt="recs-duplicate" src="/img/dart.png" title="Тиндер рекомендует"/>
-                        <span th:text="${u.getRecsDuplicateCount()}"></span>
+                         <img alt="recs-duplicate" src="/img/dart.png" title="Кол-во рекомендаций"/>
+                        <span th:text="${u.getRecsCount()}"></span>
+                    </span>
+                        <span>
+                        <img alt="recs-duplicate" src="/img/rank.png" title="Средний ранг"/>
+                        <span th:text="${u.getAvgBatchRank()}"></span>
                     </span>
                     </div>
                 </div>
