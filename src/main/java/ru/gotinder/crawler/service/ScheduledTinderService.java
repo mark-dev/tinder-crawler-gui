@@ -10,6 +10,7 @@ import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -50,14 +51,20 @@ public class ScheduledTinderService {
 
 
     /*
-     * Лайкаем тех, кто вероятно лайкнул нас (часто выдается тиндером)
+     * Автоматический лайк определенных пользователей
      * */
     @Scheduled(cron = "${tinder.crawler.autolike}")
     public void autoLike() {
-        int limit = 5 + RANDOM.nextInt(15);
-        List<CrawlerDataDTO> likes = dao.loadPossibleLikes(0, limit);
+        int maybeMatchCtx = 2 + RANDOM.nextInt(5);
+        int likeCandidateCtx = 5 + RANDOM.nextInt(15);
+        List<CrawlerDataDTO> likes = new ArrayList<>(maybeMatchCtx + likeCandidateCtx);
 
+        //Лайкаем тех, кого тиндер нам часто показывает
+        likes.addAll(dao.loadPossibleLikes(0, maybeMatchCtx));
+        //Лайкаем кандидатов на автолайк
+        likes.addAll(dao.loadAutoLikeCandidates(0, likeCandidateCtx));
 
+        //TODO: Batch??
         for (CrawlerDataDTO d : likes) {
             dao.setVerdict(d.getId(), VerdictEnum.LIKE, true);
         }

@@ -97,16 +97,9 @@ public class CrawlerDAO {
         return template.query(SQLHelper.TOP_BY_RATING, rowMapper, size, page * size);
     }
 
+
     public List<CrawlerDataDTO> search(String search, int page, int size) {
         return template.query(SQLHelper.SEARCH, rowMapper, search, size, page * size);
-    }
-
-    public Integer countSearch(String search) {
-        return template.queryForObject(SQLHelper.COUNT_SEARCH, Integer.class, search);
-    }
-
-    public Integer countTopByRating() {
-        return template.queryForObject(SQLHelper.COUNT_TOP_BY_RATING, Integer.class);
     }
 
     public List<CrawlerDataDTO> loadRandom(int size) {
@@ -117,20 +110,42 @@ public class CrawlerDAO {
         return template.query(SQLHelper.LOAD_LATEST, rowMapper, size, page * size);
     }
 
-    public Integer countLatest() {
-        return template.queryForObject(SQLHelper.COUNT_LATEST, Integer.class);
-    }
-
     public List<CrawlerDataDTO> loadVerdictedButNotSynced(VerdictEnum verdictBoundInclusive, int page, int size) {
         return template.query(SQLHelper.LOAD_VERDICTED_BUT_NOT_SYNCED, rowMapper, verdictBoundInclusive.ordinal(), size, page * size);
     }
 
-    public Integer countVerdicted() {
-        return template.queryForObject(SQLHelper.COUNT_VERDICTED_BUT_NOT_SYNCED, Integer.class);
-    }
-
     public List<CrawlerDataDTO> loadPossibleLikes(int page, int size) {
         return template.query(SQLHelper.POSSIBLE_LIKES, rowMapper, POSSIBLE_LIKES_DUPLICATE_TRESHOLD, size, page * size);
+    }
+
+    public List<CrawlerDataDTO> loadMissInImageCache(int limit) {
+        return template.query(LOAD_FOR_IMAGE_CACHE, rowMapper, limit);
+    }
+
+    public List<CrawlerDataDTO> loadAutoLikeCandidates(int page, int size) {
+        return loadByQuery(SQLHelper.LOAD_AUTOLIKE_CANDIDATES, size, page * size);
+    }
+
+    public Optional<CrawlerDataDTO> byId(String id) {
+        List<CrawlerDataDTO> res = template.query("SELECT * from crawler_data WHERE id = ?", rowMapper, id);
+        if (res.isEmpty()) return Optional.empty();
+        return Optional.of(res.get(0));
+    }
+
+    public Integer countSearch(String search) {
+        return template.queryForObject(SQLHelper.COUNT_SEARCH, Integer.class, search);
+    }
+
+    public Integer countTopByRating() {
+        return template.queryForObject(SQLHelper.COUNT_TOP_BY_RATING, Integer.class);
+    }
+
+    public Integer countLatest() {
+        return template.queryForObject(SQLHelper.COUNT_LATEST, Integer.class);
+    }
+
+    public Integer countVerdicted() {
+        return template.queryForObject(SQLHelper.COUNT_VERDICTED_BUT_NOT_SYNCED, Integer.class);
     }
 
     public Integer countPossibleLikes() {
@@ -157,9 +172,6 @@ public class CrawlerDAO {
         template.update(SET_VERDICT_SYNC_TIME, id);
     }
 
-    public List<CrawlerDataDTO> loadMissInImageCache(int limit) {
-        return template.query(LOAD_FOR_IMAGE_CACHE, rowMapper, limit);
-    }
 
     public void updateImageCacheDownloadedFlag(List<String> userIds) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -169,13 +181,12 @@ public class CrawlerDAO {
         namedJdbcTemplate.update("UPDATE crawler_data SET img_cached = true WHERE id in (:ids)", parameters);
     }
 
-    public Optional<CrawlerDataDTO> byId(String id) {
-        List<CrawlerDataDTO> res = template.query("SELECT * from crawler_data WHERE id = ?", rowMapper, id);
-        if (res.isEmpty()) return Optional.empty();
-        return Optional.of(res.get(0));
-    }
 
     public void hide(String id) {
         template.update(SQLHelper.SET_HIDDEN, id);
+    }
+
+    private List<CrawlerDataDTO> loadByQuery(String query, Object... args) {
+        return template.query(query, rowMapper, args);
     }
 }

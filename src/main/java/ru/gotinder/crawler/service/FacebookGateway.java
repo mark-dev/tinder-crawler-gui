@@ -48,12 +48,13 @@ public class FacebookGateway {
 
         settings = new DesiredCapabilities();
         settings.setJavascriptEnabled(true);
-        settings.setCapability("takesScreenshot", true);
+        settings.setCapability("takesScreenshot", false);
         settings.setCapability("userAgent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
         settings.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, driverPath);
 
         //На старте авторизируемся в фейсбуке
         //TODO: Делать это по таймеру, может протухнуть сессия
+        //TODO: Сделать ленивую загрузку, на старте это не нужно
         driver = loginToFacebook();
     }
 

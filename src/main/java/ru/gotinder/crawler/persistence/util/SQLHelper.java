@@ -45,4 +45,6 @@ public interface SQLHelper {
     String POSSIBLE_LIKES = "select * from crawler_data where verdict = 0 AND verdict_sync_at is null AND date_trunc('day', updated_at) = date_trunc('day',now()) AND avg_batch_rank_idx  > ? order by avg_batch_rank_idx DESC, id ASC LIMIT ? OFFSET ?";
     String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict = 0 AND date_trunc('day', updated_at) = date_trunc('day',now()) AND verdict_sync_at is null AND avg_batch_rank_idx  > ?";
 //    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict_sync_at is null";
+
+    String LOAD_AUTOLIKE_CANDIDATES = "select * from crawler_data where height between 150 and 170 and verdict = 0 and rating > 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
 }
