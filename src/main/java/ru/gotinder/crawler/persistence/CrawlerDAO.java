@@ -126,10 +126,22 @@ public class CrawlerDAO {
         return loadByQuery(SQLHelper.LOAD_AUTOLIKE_CANDIDATES, size, page * size);
     }
 
+    public List<CrawlerDataDTO> loadAutoDislikeCandidates(int page, int size) {
+        return loadByQuery(SQLHelper.LOAD_DISLIKE_CANDIDATES, size, page * size);
+    }
+
+    public List<CrawlerDataDTO> loadTodays(int page, int size) {
+        return loadByQuery(SQLHelper.LOAD_TODAYS, size, page * size);
+    }
+
     public Optional<CrawlerDataDTO> byId(String id) {
         List<CrawlerDataDTO> res = template.query("SELECT * from crawler_data WHERE id = ?", rowMapper, id);
         if (res.isEmpty()) return Optional.empty();
         return Optional.of(res.get(0));
+    }
+
+    public Integer countTodays() {
+        return template.queryForObject(SQLHelper.COUNT_TODAYS, Integer.class);
     }
 
     public Integer countSearch(String search) {

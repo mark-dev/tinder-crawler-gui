@@ -59,6 +59,19 @@ public class PageController {
         return "random";
     }
 
+    @GetMapping({"todays"})
+    public String todays(Model model,
+                         @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                         @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+        List<CrawlerDataDTO> users = dao.loadTodays(page, size);
+        Integer count = dao.countTodays();
+        model.addAttribute("users", users);
+        model.addAttribute("count", count);
+        model.addAttribute("size", size);
+        model.addAttribute("page", page);
+
+        return "todays";
+    }
 
     @GetMapping({"verdicted"})
     public String verdicted(Model model,

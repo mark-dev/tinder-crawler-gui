@@ -38,6 +38,9 @@ public interface SQLHelper {
 
     String LOAD_RANDOM = "select * from crawler_data where hidden = FALSE and now() - updated_at <= interval '7 days' and height > 0 and height < 170 and verdict = 0 order by random() limit ?";
 
+    String LOAD_TODAYS = "select * from crawler_data where date_trunc('day', ts) = date_trunc('day',now()) and verdict = 0 order by  rating desc limit ? OFFSET ?";
+    String COUNT_TODAYS = "select count(*) from crawler_data where date_trunc('day', ts) = date_trunc('day',now()) and verdict = 0";
+
     //TODO: Условие в запросе(case) от настроек профиля тиндер должно зависеть
     //TODO: Т.е. предполагаем что если нам дают людей с дистанцией больше чем у нас в настройках, возможно это лайк.
     //TODO: Ну и соответственно учитываем насколько "настойчиво" делает это тиндер.
@@ -46,5 +49,8 @@ public interface SQLHelper {
     String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict = 0 AND date_trunc('day', updated_at) = date_trunc('day',now()) AND verdict_sync_at is null AND avg_batch_rank_idx  > ?";
 //    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict_sync_at is null";
 
-    String LOAD_AUTOLIKE_CANDIDATES = "select * from crawler_data where height between 150 and 170 and verdict = 0 and rating > 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
+    //Лайкаем тех, кто подходит по росту и имеет не нулевой рейтинг
+    String LOAD_AUTOLIKE_CANDIDATES = "select * from crawler_data where height between 150 and 170 and rating > 0 and verdict = 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
+    //Дизлайкаем тех, кто с пустым описанием, и кто показывался меньше 5 раз
+    String LOAD_DISLIKE_CANDIDATES = "select * from crawler_data where length(bio) = 0 and avg_batch_rank_idx < 5 and verdict = 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
 }
