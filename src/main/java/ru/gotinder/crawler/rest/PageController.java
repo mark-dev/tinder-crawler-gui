@@ -73,6 +73,20 @@ public class PageController {
         return "todays";
     }
 
+    @GetMapping({"near"})
+    public String near(Model model,
+                       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                       @RequestParam(value = "size", required = false, defaultValue = "5") Integer size) {
+        List<CrawlerDataDTO> users = dao.loadNear(page, size);
+        Integer count = dao.countNear();
+        model.addAttribute("users", users);
+        model.addAttribute("count", count);
+        model.addAttribute("size", size);
+        model.addAttribute("page", page);
+
+        return "near";
+    }
+
     @GetMapping({"verdicted"})
     public String verdicted(Model model,
                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,

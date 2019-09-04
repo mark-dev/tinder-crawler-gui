@@ -38,7 +38,7 @@ public interface SQLHelper {
 
     String LOAD_RANDOM = "select * from crawler_data where hidden = FALSE and now() - updated_at <= interval '7 days' and height > 0 and height < 170 and verdict = 0 order by random() limit ?";
 
-    String LOAD_TODAYS = "select * from crawler_data where date_trunc('day', ts) = date_trunc('day',now()) and verdict = 0 order by  rating desc limit ? OFFSET ?";
+    String LOAD_TODAYS = "select * from crawler_data where date_trunc('day', ts) = date_trunc('day',now()) and verdict = 0 order by rating desc LIMIT ? OFFSET ?";
     String COUNT_TODAYS = "select count(*) from crawler_data where date_trunc('day', ts) = date_trunc('day',now()) and verdict = 0";
 
     //TODO: Условие в запросе(case) от настроек профиля тиндер должно зависеть
@@ -53,4 +53,8 @@ public interface SQLHelper {
     String LOAD_AUTOLIKE_CANDIDATES = "select * from crawler_data where height between 150 and 170 and rating > 0 and verdict = 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
     //Дизлайкаем тех, кто с пустым описанием, и кто показывался меньше 5 раз
     String LOAD_DISLIKE_CANDIDATES = "select * from crawler_data where length(bio) = 0 and avg_batch_rank_idx < 5 and verdict = 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
+
+    String LOAD_NEAR = "select * from crawler_data where date_trunc('day',now())=date_trunc('day', updated_at) and verdict = 0 and distance = 1 order by rating desc LIMIT ? OFFSET ?";
+    String COUNT_NEAR = "select count(*) from crawler_data where date_trunc('day',now())=date_trunc('day', updated_at) and verdict = 0 and distance = 1";
+
 }

@@ -26,8 +26,13 @@ import static ru.gotinder.crawler.persistence.util.SQLHelper.LOAD_FOR_IMAGE_CACH
 import static ru.gotinder.crawler.persistence.util.SQLHelper.SET_VERDICT_SYNC_TIME;
 
 //TODO: Spring Data + Specifications API
+//TODO: Можно отрефакторить DAO, ввести новое понятие - срез данных(enum: LATEST,NEAR,FOR_SYNC,TOP etc), и возвращать в одном объекте сразу список данных и count
+//TODO: Соответственно для каждого среза данных нужно будет сконфигурировать запросы на выгрузку и count
+//TODO: Это уберет дублирование кода, в местах, откуда мы вызываем данные методы (да и тут тоже уберет - по сути везде одно и тоже, только запрос меняется)
 @Service
 public class CrawlerDAO {
+
+
     @Autowired
     private JdbcTemplate template;
 
@@ -45,6 +50,7 @@ public class CrawlerDAO {
     }
 
     private static final VerdictEnum[] VERDICT_ENUMS = VerdictEnum.values();
+
     private RowMapper<CrawlerDataDTO> rowMapper = (rs, rowNum) -> {
         String[] photos = (String[]) rs.getArray("photos").getArray();
         CrawlerDataDTO dto = new CrawlerDataDTO();
@@ -97,7 +103,6 @@ public class CrawlerDAO {
         return template.query(SQLHelper.TOP_BY_RATING, rowMapper, size, page * size);
     }
 
-
     public List<CrawlerDataDTO> search(String search, int page, int size) {
         return template.query(SQLHelper.SEARCH, rowMapper, search, size, page * size);
     }
@@ -140,8 +145,16 @@ public class CrawlerDAO {
         return Optional.of(res.get(0));
     }
 
+    public List<CrawlerDataDTO> loadNear(int page, int size) {
+        return loadByQuery(SQLHelper.LOAD_NEAR, size, page * size);
+    }
+
     public Integer countTodays() {
         return template.queryForObject(SQLHelper.COUNT_TODAYS, Integer.class);
+    }
+
+    public Integer countNear() {
+        return template.queryForObject(SQLHelper.COUNT_NEAR, Integer.class);
     }
 
     public Integer countSearch(String search) {
