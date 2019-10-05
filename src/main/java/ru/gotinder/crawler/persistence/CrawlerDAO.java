@@ -95,8 +95,12 @@ public class CrawlerDAO {
         template.batchUpdate(SQLHelper.INSERT_CRAWLER_DATA, new CrawlerDataPreparedStatementSetter(asArrayList));
     }
 
+    public List<CrawlerDataDTO> loadSuperLikeCandidates(int limit){
+        return template.query(SQLHelper.LOAD_AUTO_SUPERLIKE_TARGETS, rowMapper, limit);
+    }
+
     public List<CrawlerDataDTO> loadEnrichRequired(int limit) {
-        return template.query(SQLHelper.LOAD_ENRICH_REQUIRED, rowMapper, 500);
+        return template.query(SQLHelper.LOAD_ENRICH_REQUIRED, rowMapper, limit);
     }
 
     public List<CrawlerDataDTO> topByRating(int page, int size) {

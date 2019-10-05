@@ -49,6 +49,7 @@ public interface SQLHelper {
     String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict = 0 AND date_trunc('day', updated_at) = date_trunc('day',now()) AND verdict_sync_at is null AND avg_batch_rank_idx  > ?";
 //    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict_sync_at is null";
 
+    String LOAD_AUTO_SUPERLIKE_TARGETS = "select * from crawler_data where verdict = 3 and verdict_sync_at is null order by verdicted_at desc limit ?";
     //Лайкаем тех, кто подходит по росту и имеет не нулевой рейтинг
     String LOAD_AUTOLIKE_CANDIDATES = "select * from crawler_data where height between 150 and 170 and rating > 0 and verdict = 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
     //Дизлайкаем тех, кто с пустым описанием, и кто показывался меньше 5 раз

@@ -25,6 +25,15 @@ public class ScheduledTinderService {
     @Autowired
     CrawlerDAO dao;
 
+    // Пытаемся синхронизировать авто лайк - последний поставленный
+    @Scheduled(cron = "${tinder.crawler.superlikesync}")
+    public void autoSuperLike(){
+        List<CrawlerDataDTO> targets = dao.loadSuperLikeCandidates(1);
+        log.info("Auto superlike sync targets is {}",targets);
+        tcs.syncVerdictsBatch(targets);
+    }
+
+
     /*Выкачиваем с тиндера новые рекомендации */
     @Scheduled(cron = "${tinder.crawler.cron}")
     public void sheduleCrawNewData() {
