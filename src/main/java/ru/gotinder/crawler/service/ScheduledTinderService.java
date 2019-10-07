@@ -12,6 +12,7 @@ import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 
+import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -35,36 +36,57 @@ public class ScheduledTinderService {
     //TODO: use spring bean
     ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
+    @PostConstruct
+    public void init() {
+        scheduleSuperLikeSyncAfter(TimeUnit.MINUTES.toSeconds(5));
+    }
+
+
+    private void scheduleSuperLikeSyncAfter(long delayInSec) {
+        Instant now = Instant.now();
+        log.info("We schedule next auto super like sync at {}", now.plusSeconds(delayInSec));
+        scheduledExecutor.schedule(this::scheduledSuperLikeSync, delayInSec, TimeUnit.SECONDS);
+    }
+
+    private void scheduledSuperLikeSync() {
+        Instant nextSchedule = trySyncAutoLike();
+        if (nextSchedule != null) {
+            Instant now = Instant.now();
+            long delay = Duration.between(now, nextSchedule).getSeconds() + 1;
+            if (delay <= 0) {
+                delay = 1; // Sync now!
+            }
+            scheduleSuperLikeSyncAfter(delay);
+        } else {
+            log.error("trySyncAutoLike() return null! Some tinder-backend exception occurs?");
+            scheduleSuperLikeSyncAfter(TimeUnit.MINUTES.toSeconds(30));
+        }
+    }
+
     // Пытаемся синхронизировать авто лайк - последний поставленный
-    @Scheduled(cron = "${tinder.crawler.superlikesync}")
-    public void autoSuperLike() {
+    private Instant trySyncAutoLike() {
         int superLikesPerDay = 1;
         List<CrawlerDataDTO> targets = dao.loadSuperLikeCandidates(superLikesPerDay);
         log.info("Auto superlike sync targets is {}", targets);
         List<SyncVerdictResponse> responses = tcs.syncVerdictsBatch(targets);
+        Instant nextSchedule = null;
+
         for (SyncVerdictResponse r : responses) {
-            if (!r.isSuccess()) {
-                if (r.getTinderResponse() instanceof SuperLikeResponse) {
-                    SuperLikeResponse superlike = (SuperLikeResponse) r.getTinderResponse();
-                    try {
-                        SuperLike actualResponse = superlike.getSuperLike();
-                        if (actualResponse.isLimitExceeded()) {
-                            Instant resetAt = actualResponse.getResetAt();
-                            long delay = Duration.between(Instant.now(), resetAt).getSeconds() + 1;
-                            log.info("Superlike limit exceeded, expected reset at = {}, try after {} sec delay", resetAt, delay);
-                            scheduledExecutor.schedule(this::autoSuperLike, delay, TimeUnit.SECONDS);
-                            //Там заодно и другие суперлайки попробуем прогнать
-                            //нет смысла порождать новые задачи, все последующие будут тоже зафейленны
-                            break;
-                        } else {
-                            log.info("Superlike failed, unexpected reason {}", superlike);
-                        }
-                    } catch (Exception ex) {
-                        log.error("Exception while parsing superlike json response", ex);
+            if (r.getTinderResponse() instanceof SuperLikeResponse) {
+                SuperLikeResponse superlike = (SuperLikeResponse) r.getTinderResponse();
+                try {
+                    SuperLike actualResponse = superlike.getSuperLike();
+                    Instant resetAt = actualResponse.getResetAt();
+                    //Планируем вернуть минимальное время, когда можно заново попробовать синхронизировать суперлайки
+                    if (nextSchedule == null || nextSchedule.compareTo(resetAt) > 0) {
+                        nextSchedule = resetAt;
                     }
+                } catch (Exception ex) {
+                    log.error("Exception while parsing superlike json response", ex);
                 }
             }
         }
+        return nextSchedule;
     }
 
 
