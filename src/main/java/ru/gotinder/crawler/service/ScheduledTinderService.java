@@ -1,5 +1,6 @@
 package ru.gotinder.crawler.service;
 
+import com.djm.tinder.like.SuperLike;
 import com.djm.tinder.like.SuperLikeResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,8 @@ import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,7 +38,8 @@ public class ScheduledTinderService {
     // Пытаемся синхронизировать авто лайк - последний поставленный
     @Scheduled(cron = "${tinder.crawler.superlikesync}")
     public void autoSuperLike() {
-        List<CrawlerDataDTO> targets = dao.loadSuperLikeCandidates(1);
+        int superLikesPerDay = 1;
+        List<CrawlerDataDTO> targets = dao.loadSuperLikeCandidates(superLikesPerDay);
         log.info("Auto superlike sync targets is {}", targets);
         List<SyncVerdictResponse> responses = tcs.syncVerdictsBatch(targets);
         for (SyncVerdictResponse r : responses) {
@@ -45,13 +47,18 @@ public class ScheduledTinderService {
                 if (r.getTinderResponse() instanceof SuperLikeResponse) {
                     SuperLikeResponse superlike = (SuperLikeResponse) r.getTinderResponse();
                     try {
-                        Instant resetAt = superlike.getSuperLike().getResetAt();
-                        long delay = 1 + Instant
-                                .now()
-                                .minus(resetAt.getEpochSecond(), ChronoUnit.SECONDS)
-                                .getEpochSecond();
-                        log.info("Superlike failed, expected reset at = {}, try after {} sec delay", resetAt, delay);
-                        scheduledExecutor.schedule(this::autoSuperLike, delay, TimeUnit.SECONDS);
+                        SuperLike actualResponse = superlike.getSuperLike();
+                        if (actualResponse.isLimitExceeded()) {
+                            Instant resetAt = actualResponse.getResetAt();
+                            long delay = Duration.between(Instant.now(), resetAt).getSeconds() + 1;
+                            log.info("Superlike limit exceeded, expected reset at = {}, try after {} sec delay", resetAt, delay);
+                            scheduledExecutor.schedule(this::autoSuperLike, delay, TimeUnit.SECONDS);
+                            //Там заодно и другие суперлайки попробуем прогнать
+                            //нет смысла порождать новые задачи, все последующие будут тоже зафейленны
+                            break;
+                        } else {
+                            log.info("Superlike failed, unexpected reason {}", superlike);
+                        }
                     } catch (Exception ex) {
                         log.error("Exception while parsing superlike json response", ex);
                     }
