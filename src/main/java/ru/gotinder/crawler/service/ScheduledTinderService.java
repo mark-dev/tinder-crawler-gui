@@ -1,9 +1,9 @@
 package ru.gotinder.crawler.service;
 
 import com.djm.tinder.like.SuperLike;
-import com.djm.tinder.like.SuperLikeResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
@@ -33,12 +33,16 @@ public class ScheduledTinderService {
     @Autowired
     CrawlerDAO dao;
 
+    @Value("{tinder.crawler.auto-superlike-sync}")
+    private Boolean autoSuperLikeSync;
+
     //TODO: use spring bean
     ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
     @PostConstruct
     public void init() {
-        scheduleSuperLikeSyncAfter(TimeUnit.MINUTES.toSeconds(5));
+        if (autoSuperLikeSync)
+            scheduleSuperLikeSyncAfter(TimeUnit.MINUTES.toSeconds(5));
     }
 
 
@@ -72,18 +76,15 @@ public class ScheduledTinderService {
         Instant nextSchedule = null;
 
         for (SyncVerdictResponse r : responses) {
-            if (r.getTinderResponse() instanceof SuperLikeResponse) {
-                SuperLikeResponse superlike = (SuperLikeResponse) r.getTinderResponse();
-                try {
-                    SuperLike actualResponse = superlike.getSuperLike();
-                    Instant resetAt = actualResponse.getResetAt();
-                    //Планируем вернуть минимальное время, когда можно заново попробовать синхронизировать суперлайки
-                    if (nextSchedule == null || nextSchedule.compareTo(resetAt) > 0) {
-                        nextSchedule = resetAt;
-                    }
-                } catch (Exception ex) {
-                    log.error("Exception while parsing superlike json response", ex);
+            if (r.getTinderResponse() instanceof SuperLike) {
+                SuperLike superlike = (SuperLike) r.getTinderResponse();
+                Instant resetAt = superlike.getResetAt();
+                //Планируем вернуть минимальное время, когда можно заново попробовать синхронизировать суперлайки
+                if (nextSchedule == null || nextSchedule.compareTo(resetAt) > 0) {
+                    nextSchedule = resetAt;
                 }
+            } else {
+                log.error("Unexpected tinder response {}", r);
             }
         }
         return nextSchedule;
