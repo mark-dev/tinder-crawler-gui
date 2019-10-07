@@ -33,7 +33,7 @@ public class ScheduledTinderService {
     @Autowired
     CrawlerDAO dao;
 
-    @Value("{tinder.crawler.auto-superlike-sync}")
+    @Value("${tinder.crawler.auto-superlike-sync}")
     private Boolean autoSuperLikeSync;
 
     //TODO: use spring bean
