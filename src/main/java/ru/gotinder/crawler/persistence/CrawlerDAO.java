@@ -42,7 +42,7 @@ public class CrawlerDAO {
 
     private NamedParameterJdbcTemplate namedJdbcTemplate;
 
-    public static final int POSSIBLE_LIKES_DUPLICATE_TRESHOLD = 20;
+    public static final int POSSIBLE_LIKES_DUPLICATE_TRESHOLD = 40;
 
     @PostConstruct
     public void init() {
