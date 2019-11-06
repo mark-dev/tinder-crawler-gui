@@ -46,7 +46,7 @@ public interface SQLHelper {
     //TODO: Ну и соответственно учитываем насколько "настойчиво" делает это тиндер.
 //    String POSSIBLE_LIKES = "select * from crawler_data where verdict_sync_at is null order by (recs_duplicate_count*recs_duplicate_count*(CASE WHEN distance <= 10 THEN 1 WHEN distance > 10 THEN 10 END)) DESC LIMIT ? OFFSET ?";
     String POSSIBLE_LIKES = "select * from crawler_data where verdict = 0 AND verdict_sync_at is null AND now() - updated_at <= interval '7 days'  AND avg_batch_rank_idx  > ? order by avg_batch_rank_idx DESC, id ASC LIMIT ? OFFSET ?";
-    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict = 0 AND date_trunc('day', updated_at) = date_trunc('day',now()) AND verdict_sync_at is null AND avg_batch_rank_idx  > ?";
+    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict = 0 AND now() - updated_at <= interval '7 days' AND verdict_sync_at is null AND avg_batch_rank_idx  > ?";
 //    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict_sync_at is null";
 
     String LOAD_AUTO_SUPERLIKE_TARGETS = "select * from crawler_data where verdict = 3 and verdict_sync_at is null order by verdicted_at desc limit ?";
