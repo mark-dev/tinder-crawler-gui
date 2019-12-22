@@ -42,8 +42,6 @@ public class CrawlerDAO {
 
     private NamedParameterJdbcTemplate namedJdbcTemplate;
 
-    public static final int POSSIBLE_LIKES_DUPLICATE_TRESHOLD = 40;
-
     @PostConstruct
     public void init() {
         namedJdbcTemplate = new NamedParameterJdbcTemplate(template.getDataSource());
@@ -178,7 +176,7 @@ public class CrawlerDAO {
     }
 
     public Integer countPossibleLikes() {
-        return template.queryForObject(SQLHelper.COUNT_POSSIBLE_LIKES, Integer.class, POSSIBLE_LIKES_DUPLICATE_TRESHOLD);
+        return template.queryForObject(SQLHelper.COUNT_POSSIBLE_LIKES, Integer.class);
     }
 
     public void enrichData(Map<String, EnrichDataDTO> ratingMap) {
