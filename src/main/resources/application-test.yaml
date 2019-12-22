@@ -1,0 +1,9 @@
+tinder:
+  crawler:
+    fb:
+      enabled: false
+
+spring:
+  datasource:
+    #TODO: use tcrawler user
+    url: jdbc:postgresql://192.168.1.41/tcrawler?user=postgres&password=postgres

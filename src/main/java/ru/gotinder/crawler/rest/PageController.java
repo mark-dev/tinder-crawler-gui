@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.gotinder.crawler.persistence.CrawlerDAO;
 import ru.gotinder.crawler.persistence.dto.CrawlerDataDTO;
 import ru.gotinder.crawler.persistence.dto.VerdictEnum;
-import ru.gotinder.crawler.service.FacebookGateway;
 import ru.gotinder.crawler.service.TinderCrawlerService;
 
 import java.util.Arrays;
@@ -25,9 +24,6 @@ public class PageController {
 
     @Autowired
     CrawlerDAO dao;
-
-    @Autowired
-    FacebookGateway facebookGateway;
 
     @Autowired
     TinderCrawlerService tcs;

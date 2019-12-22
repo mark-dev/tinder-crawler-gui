@@ -8,7 +8,9 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import ru.gotinder.crawler.common.IFacebookService;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
@@ -18,7 +20,8 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Service
-public class FacebookGateway {
+@ConditionalOnProperty(value = "tinder.crawler.fb.enabled", havingValue = "true")
+public class FacebookGateway implements IFacebookService {
     private static Pattern EXTRACT_TOKEN_PATTERN = Pattern.compile("access_token=([\\w\\d]+)");
 
     @Value("${tinder.crawler.fb.login-url}")

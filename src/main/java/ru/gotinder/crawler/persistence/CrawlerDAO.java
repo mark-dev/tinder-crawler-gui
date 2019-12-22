@@ -124,7 +124,7 @@ public class CrawlerDAO {
     }
 
     public List<CrawlerDataDTO> loadPossibleLikes(int page, int size) {
-        return template.query(SQLHelper.POSSIBLE_LIKES, rowMapper, POSSIBLE_LIKES_DUPLICATE_TRESHOLD, size, page * size);
+        return template.query(SQLHelper.POSSIBLE_LIKES, rowMapper, size, page * size);
     }
 
     public List<CrawlerDataDTO> loadMissInImageCache(int limit) {

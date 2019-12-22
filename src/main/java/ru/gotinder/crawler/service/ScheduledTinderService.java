@@ -126,7 +126,7 @@ public class ScheduledTinderService {
     @Scheduled(cron = "${tinder.crawler.autolike}")
     public void autoLike() {
         int maybeMatchCtx = 2 + RANDOM.nextInt(5);
-        int likeCandidateCtx = 5 + RANDOM.nextInt(15);
+        int likeCandidateCtx = 10 + RANDOM.nextInt(15);
 
         List<CrawlerDataDTO> likes = new ArrayList<>(maybeMatchCtx + likeCandidateCtx);
 

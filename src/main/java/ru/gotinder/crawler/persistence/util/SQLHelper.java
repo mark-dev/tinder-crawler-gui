@@ -22,40 +22,38 @@ public interface SQLHelper {
     String COUNT_ENRICH_REQUIRED = "select count(*) from crawler_data where enrich_required;";
     String LOAD_ENRICH_REQUIRED = "SELECT * FROM crawler_data WHERE enrich_required LIMIT ?";
 
-    String TOP_BY_RATING = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null ORDER BY rating desc, updated_at DESC, id ASC LIMIT ? OFFSET ?";
-    String COUNT_TOP_BY_RATING = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null";
+    String TOP_BY_RATING = "SELECT * FROM tcrawler_top LIMIT ? OFFSET ?";
+    String COUNT_TOP_BY_RATING = "SELECT count(*) FROM tcrawler_top";
 
-    String SEARCH = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null AND (lower(bio) like '%'|| lower(?) || '%') order by updated_at DESC, id ASC LIMIT ? OFFSET ?";
-    String COUNT_SEARCH = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict = 0 AND verdict_sync_at is null AND (lower(bio) like '%'|| lower(?) || '%')";
+    String SEARCH = "SELECT * FROM tcrawler_search WHERE (lower(bio) like '%'|| lower(?) || '%') LIMIT ? OFFSET ?";
+    String COUNT_SEARCH = "SELECT count(*) FROM tcrawler_search WHERE (lower(bio) like '%'|| lower(?) || '%')";
 
-    String COUNT_LATEST = "SELECT count(*) from crawler_data WHERE rating > 0 AND hidden = FALSE AND verdict = 0 AND verdict_sync_at is null";
-    String LOAD_LATEST = "select * from crawler_data WHERE rating > 0 AND hidden = FALSE AND verdict = 0 AND verdict_sync_at is null " +
-            "order by date_trunc('day', GREATEST(ts,updated_at)) DESC, rating DESC, length(bio) DESC, id ASC " +
-            "LIMIT ? OFFSET ?";
+    String LOAD_LATEST = "SELECT * FROM tcrawler_latest LIMIT ? OFFSET ?";
+    String COUNT_LATEST = "SELECT count(*) FROM tcrawler_latest";
 
     String LOAD_VERDICTED_BUT_NOT_SYNCED = "SELECT * FROM crawler_data WHERE hidden = FALSE AND verdict > 0 AND verdict <= ? AND verdict_sync_at is null ORDER BY verdict DESC, verdicted_at DESC, id ASC LIMIT ? OFFSET ?";
     String COUNT_VERDICTED_BUT_NOT_SYNCED = "SELECT count(*) FROM crawler_data WHERE hidden = FALSE AND verdict <> 0 AND verdict_sync_at is null";
 
-    String LOAD_RANDOM = "select * from crawler_data where hidden = FALSE and now() - updated_at <= interval '7 days' and height > 0 and height < 170 and verdict = 0 order by random() limit ?";
+    String LOAD_RANDOM = "select * from tcrawler_random limit ?";
 
-    String LOAD_TODAYS = "select * from crawler_data where date_trunc('day', ts) = date_trunc('day',now()) and verdict = 0 order by rating desc LIMIT ? OFFSET ?";
-    String COUNT_TODAYS = "select count(*) from crawler_data where date_trunc('day', ts) = date_trunc('day',now()) and verdict = 0";
+    String LOAD_TODAYS = "SELECT * from tcrawler_today LIMIT ? OFFSET ?";
+    String COUNT_TODAYS = "SELECT count(*) FROM tcrawler_today";
 
     //TODO: Условие в запросе(case) от настроек профиля тиндер должно зависеть
     //TODO: Т.е. предполагаем что если нам дают людей с дистанцией больше чем у нас в настройках, возможно это лайк.
     //TODO: Ну и соответственно учитываем насколько "настойчиво" делает это тиндер.
 //    String POSSIBLE_LIKES = "select * from crawler_data where verdict_sync_at is null order by (recs_duplicate_count*recs_duplicate_count*(CASE WHEN distance <= 10 THEN 1 WHEN distance > 10 THEN 10 END)) DESC LIMIT ? OFFSET ?";
-    String POSSIBLE_LIKES = "select * from crawler_data where verdict = 0 AND verdict_sync_at is null AND now() - updated_at <= interval '7 days'  AND avg_batch_rank_idx  > ? order by avg_batch_rank_idx DESC, id ASC LIMIT ? OFFSET ?";
-    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict = 0 AND now() - updated_at <= interval '7 days' AND verdict_sync_at is null AND avg_batch_rank_idx  > ?";
+    String POSSIBLE_LIKES = "select * from tcrawler_possible_likes LIMIT ? OFFSET ?";
+    String COUNT_POSSIBLE_LIKES = "select count(*) from tcrawler_possible_likes";
 //    String COUNT_POSSIBLE_LIKES = "select count(*) from crawler_data where verdict_sync_at is null";
 
     String LOAD_AUTO_SUPERLIKE_TARGETS = "select * from crawler_data where verdict = 3 and verdict_sync_at is null order by verdicted_at desc limit ?";
     //Лайкаем тех, кто подходит по росту и имеет не нулевой рейтинг
-    String LOAD_AUTOLIKE_CANDIDATES = "select * from crawler_data where height between 150 and 170 and rating > 0 and verdict = 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
+    String LOAD_AUTOLIKE_CANDIDATES = "select * from tcrawler_autolike LIMIT ? OFFSET ?";
     //Дизлайкаем тех, кто с пустым описанием, и кто показывался меньше 5 раз
-    String LOAD_DISLIKE_CANDIDATES = "select * from crawler_data where length(bio) = 0 and avg_batch_rank_idx < 5 and verdict = 0 order by updated_at asc,id ASC LIMIT ? OFFSET ?";
+    String LOAD_DISLIKE_CANDIDATES = "SELECT * FROM tcrawler_autodislike LIMIT ? OFFSET ?";
 
-    String LOAD_NEAR = "select * from crawler_data where date_trunc('day',now())=date_trunc('day', updated_at) and verdict = 0 and distance = 1 order by rating desc LIMIT ? OFFSET ?";
-    String COUNT_NEAR = "select count(*) from crawler_data where date_trunc('day',now())=date_trunc('day', updated_at) and verdict = 0 and distance = 1";
+    String LOAD_NEAR = "select * from tcrawler_near LIMIT ? OFFSET ?";
+    String COUNT_NEAR = "select count(*) from tcrawler_near";
 
 }

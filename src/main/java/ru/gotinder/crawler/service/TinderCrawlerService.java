@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.gotinder.crawler.common.IFacebookService;
 import ru.gotinder.crawler.common.SyncVerdictResponse;
 import ru.gotinder.crawler.enrich.HeightExtractorService;
 import ru.gotinder.crawler.enrich.ScoringModelService;
@@ -29,7 +30,7 @@ public class TinderCrawlerService {
     private static final Random RANDOM = new Random();
 
     @Autowired
-    FacebookGateway fb;
+    IFacebookService fb;
 
     @Autowired
     CrawlerDAO dao;

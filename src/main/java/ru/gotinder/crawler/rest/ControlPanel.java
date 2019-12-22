@@ -12,7 +12,6 @@ import ru.gotinder.crawler.persistence.dto.VerdictEnum;
 import ru.gotinder.crawler.rest.dto.SetVerdictDTO;
 import ru.gotinder.crawler.rest.dto.SyncAllVerdictsDTO;
 import ru.gotinder.crawler.rest.dto.SyncVerdictDTO;
-import ru.gotinder.crawler.service.FacebookGateway;
 import ru.gotinder.crawler.service.TinderCrawlerService;
 
 import java.util.List;
@@ -25,11 +24,6 @@ public class ControlPanel {
 
     @Autowired
     private CrawlerDAO dao;
-
-
-    @Autowired
-    private FacebookGateway facebookGateway;
-
 
     @Autowired
     private TinderCrawlerService tcs;
