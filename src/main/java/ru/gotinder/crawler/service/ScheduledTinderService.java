@@ -126,7 +126,7 @@ public class ScheduledTinderService {
     @Scheduled(cron = "${tinder.crawler.autolike}")
     public void autoLike() {
         int maybeMatchCtx = 2 + RANDOM.nextInt(5);
-        int likeCandidateCtx = 10 + RANDOM.nextInt(15);
+        int likeCandidateCtx = 5 + RANDOM.nextInt(5);
 
         List<CrawlerDataDTO> likes = new ArrayList<>(maybeMatchCtx + likeCandidateCtx);
 
@@ -143,7 +143,7 @@ public class ScheduledTinderService {
         //TODO: Так-то теоретически могут пересечься два этих множества.. (like и dislike) но считаем что это оч редкая ситуация.
 
         //Кого-то дизлайкаем (эмулируем реального человека)
-        int dislikeCandidateCtx = 5 + RANDOM.nextInt(15);
+        int dislikeCandidateCtx = 10 + RANDOM.nextInt(15);
         List<CrawlerDataDTO> disLikes = new ArrayList<>(dislikeCandidateCtx);
         disLikes.addAll(dao.loadAutoDislikeCandidates(0, dislikeCandidateCtx));
 

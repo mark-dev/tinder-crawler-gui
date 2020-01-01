@@ -14,7 +14,7 @@ public interface SQLHelper {
 
     String DROP_ENRICH_FLAG = "UPDATE crawler_data SET enrich_required = true";
 
-    String SET_VERDICT = "UPDATE crawler_data SET verdict = ?, verdicted_at = now(), autoliked = ?  WHERE id = ?";
+    String SET_VERDICT = "UPDATE crawler_data SET verdict = ?, verdict_sync_at = null, verdicted_at = now(), autoliked = ?  WHERE id = ?";
     String SET_VERDICT_SYNC_TIME = "UPDATE crawler_data SET verdict_sync_at = now() WHERE id = ?";
 
     String LOAD_FOR_IMAGE_CACHE = "SELECT * FROM crawler_data WHERE img_cached = false LIMIT ?";
