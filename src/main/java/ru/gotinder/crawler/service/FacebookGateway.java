@@ -51,8 +51,9 @@ public class FacebookGateway implements IFacebookService {
         settings = new ChromeOptions();
         settings.setBinary(chromePath);
         settings.addArguments("--headless");
-	settings.addArguments("--no-sandbox");
-	settings.addArguments("--disable-dev-shm-usage");
+        settings.addArguments("--no-sandbox");
+        settings.addArguments("--disable-gpu");
+        settings.addArguments("--disable-dev-shm-usage");
         //На старте авторизируемся в фейсбуке
         //TODO: Делать это по таймеру, может протухнуть сессия
         //TODO: Сделать ленивую загрузку, на старте это не нужно
