@@ -35,8 +35,8 @@ public class FacebookGateway implements IFacebookService {
     @Value("${tinder.crawler.fb.token-url}")
     private String facebookTinderSignInUrl;
 
-    @Value("${tinder.crawler.fb.driver-path}")
-    private String driverPath;
+    @Value("${tinder.crawler.fb.chrome-path}")
+    private String chromePath;
 
 
     private String token;
@@ -49,9 +49,10 @@ public class FacebookGateway implements IFacebookService {
     public void init() {
 
         settings = new ChromeOptions();
-        settings.setBinary(driverPath);
+        settings.setBinary(chromePath);
         settings.addArguments("--headless");
-
+	settings.addArguments("--no-sandbox");
+	settings.addArguments("--disable-dev-shm-usage");
         //На старте авторизируемся в фейсбуке
         //TODO: Делать это по таймеру, может протухнуть сессия
         //TODO: Сделать ленивую загрузку, на старте это не нужно
