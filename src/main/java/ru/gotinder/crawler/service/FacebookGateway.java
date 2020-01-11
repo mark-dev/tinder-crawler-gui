@@ -4,9 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriverService;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -44,16 +43,14 @@ public class FacebookGateway implements IFacebookService {
     private Instant lastTokenTs = null;
 
     private WebDriver driver;
-    private DesiredCapabilities settings;
+    private ChromeOptions settings;
 
     @PostConstruct
     public void init() {
 
-        settings = new DesiredCapabilities();
-        settings.setJavascriptEnabled(true);
-        settings.setCapability("takesScreenshot", false);
-        settings.setCapability("userAgent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
-        settings.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, driverPath);
+        settings = new ChromeOptions();
+        settings.setBinary(driverPath);
+        settings.addArguments("--headless");
 
         //На старте авторизируемся в фейсбуке
         //TODO: Делать это по таймеру, может протухнуть сессия
@@ -70,7 +67,7 @@ public class FacebookGateway implements IFacebookService {
 
     private WebDriver loginToFacebook() {
         try {
-            WebDriver driver = new PhantomJSDriver(settings);
+            WebDriver driver = new ChromeDriver(settings);
             driver.get(facebookLoginUrl);
 
             WebElement login = driver.findElement(By.id("email"));

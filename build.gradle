@@ -55,8 +55,9 @@ dependencies {
 
     //Facebook auth
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
-    implementation group: 'com.codeborne', name: 'phantomjsdriver', version: '1.4.4'
-    
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.141.59'
+
+
     //Misc
     implementation fileTree(dir: 'libs', include: '*.jar') //non maven deps
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
