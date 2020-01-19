@@ -129,12 +129,12 @@ public class CrawlerDAO {
         return template.query(LOAD_FOR_IMAGE_CACHE, rowMapper, limit);
     }
 
-    public List<CrawlerDataDTO> loadAutoLikeCandidates(int page, int size) {
-        return loadByQuery(SQLHelper.LOAD_AUTOLIKE_CANDIDATES, size, page * size);
+    public List<CrawlerDataDTO> loadAutoLikeCandidates() {
+        return loadByQuery(SQLHelper.LOAD_AUTOLIKE_CANDIDATES);
     }
 
-    public List<CrawlerDataDTO> loadAutoDislikeCandidates(int page, int size) {
-        return loadByQuery(SQLHelper.LOAD_DISLIKE_CANDIDATES, size, page * size);
+    public List<CrawlerDataDTO> loadAutoDislikeCandidates() {
+        return loadByQuery(SQLHelper.LOAD_DISLIKE_CANDIDATES);
     }
 
     public List<CrawlerDataDTO> loadTodays(int page, int size) {

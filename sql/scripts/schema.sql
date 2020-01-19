@@ -105,12 +105,14 @@ where now() - updated_at <= interval '7 days'  AND avg_batch_rank_idx  > 40
 CREATE VIEW tcrawler_autolike AS
 select * from tcrawler_no_verdict
 where height between 150 and 170 and rating > 0
-order by updated_at asc,id ASC;
+order by updated_at asc,id ASC
+limit 10;
 
 CREATE VIEW tcrawler_autodislike AS
 select * from tcrawler_no_verdict
 where length(bio) = 0 and avg_batch_rank_idx < 5
-order by updated_at asc,id ASC;
+order by updated_at asc,id ASC
+limit 10;
 
 CREATE VIEW tcrawler_near AS
 select * from tcrawler_no_verdict where date_trunc('day',now())=date_trunc('day', updated_at)

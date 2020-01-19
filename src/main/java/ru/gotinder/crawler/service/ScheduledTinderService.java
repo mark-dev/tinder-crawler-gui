@@ -125,16 +125,8 @@ public class ScheduledTinderService {
      * */
     @Scheduled(cron = "${tinder.crawler.autolike}")
     public void autoLike() {
-        int maybeMatchCtx = 2 + RANDOM.nextInt(5);
-        int likeCandidateCtx = 5 + RANDOM.nextInt(5);
 
-        List<CrawlerDataDTO> likes = new ArrayList<>(maybeMatchCtx + likeCandidateCtx);
-
-        //Лайкаем тех, кого тиндер нам часто показывает
-        likes.addAll(dao.loadPossibleLikes(0, maybeMatchCtx));
-        //Лайкаем кандидатов на автолайк
-        likes.addAll(dao.loadAutoLikeCandidates(0, likeCandidateCtx));
-
+        List<CrawlerDataDTO> likes = new ArrayList<>(dao.loadAutoLikeCandidates());
         //TODO: Batch??
         for (CrawlerDataDTO d : likes) {
             dao.setVerdict(d.getId(), VerdictEnum.LIKE, true);
@@ -143,9 +135,7 @@ public class ScheduledTinderService {
         //TODO: Так-то теоретически могут пересечься два этих множества.. (like и dislike) но считаем что это оч редкая ситуация.
 
         //Кого-то дизлайкаем (эмулируем реального человека)
-        int dislikeCandidateCtx = 10 + RANDOM.nextInt(15);
-        List<CrawlerDataDTO> disLikes = new ArrayList<>(dislikeCandidateCtx);
-        disLikes.addAll(dao.loadAutoDislikeCandidates(0, dislikeCandidateCtx));
+        List<CrawlerDataDTO> disLikes = new ArrayList<>(dao.loadAutoDislikeCandidates());
 
         for (CrawlerDataDTO d : disLikes) {
             dao.setVerdict(d.getId(), VerdictEnum.PASS, true);
